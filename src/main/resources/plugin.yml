@@ -1,0 +1,8 @@
+name: TreeboTreasures
+version: ${project.version}
+main: me.shakeforprotein.treebotreasures.TreeboTreasures
+api-version: 1.13
+prefix: [TreeboTreasures]
+authors: [ShakeforProtein]
+description: An easy to use rewards plugin, featuring configurable reward tiers and an intuitive admin interface.
+website: treebo.games/minecraft
