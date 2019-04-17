@@ -1,4 +1,4 @@
-package UpdateChecker;
+package me.shakeforprotein.treebotreasures.UpdateChecker;
 
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
 import org.bukkit.Bukkit;

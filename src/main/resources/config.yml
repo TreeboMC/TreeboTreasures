@@ -1,0 +1,45 @@
+msg:
+  badge: '&6[Treebo Teleport]&r '
+  error: '&4ERROR:&r '
+  badCommand: '$4Incorrect usage:$r '
+
+connection:
+  host: ''
+  port: ''
+  database: ''
+  username: ''
+  password: ''
+  table: 'TreeboTreasures'
+
+categories:
+  common: 'common.yml'
+  rare: 'rare.yml'
+  legendary: 'legendary.yml'
+  mythic: 'mythic.yml'
+
+#Events will change the loot table in their given month.
+events:
+  1:
+    name: ''
+  2:
+    name: ''
+  3:
+    name: ''
+  4:
+    name: 'easter'
+  5:
+    name: ''
+  6:
+    name: ''
+  7:
+    name: ''
+  8:
+    name: ''
+  9:
+    name: ''
+  10:
+    name: 'halloween'
+  11:
+    name: ''
+  12:
+    name: 'christmas'

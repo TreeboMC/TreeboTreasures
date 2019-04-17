@@ -1,84 +1,104 @@
 package me.shakeforprotein.treebotreasures;
 
-import UpdateChecker.UpdateChecker;
-import me.shakeforprotein.treebotreasures.Commands.AddKey;
-import me.shakeforprotein.treebotreasures.Commands.ConfigureRewards;
-import me.shakeforprotein.treebotreasures.Commands.RemoveKey;
-import me.shakeforprotein.treebotreasures.Commands.TestRewards;
-import me.shakeforprotein.treebotreasures.Listeners.InventoryListener;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.plugin.Plugin;
+import me.shakeforprotein.treebotreasures.Commands.*;
+import me.shakeforprotein.treebotreasures.Guis.RewardsGui;
+import me.shakeforprotein.treebotreasures.Listeners.OpenRewardsGuiListener;
+import me.shakeforprotein.treebotreasures.Listeners.TicketSelectGuiListener;
+import me.shakeforprotein.treebotreasures.Methods.CreateTables;
+import me.shakeforprotein.treebotreasures.Methods.DbKeepAlive;
+import me.shakeforprotein.treebotreasures.UpdateChecker.UpdateChecker;
+import me.shakeforprotein.treebotreasures.Listeners.ConfigureListener;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.sql.*;
 
 public final class TreeboTreasures extends JavaPlugin {
 
 
     private UpdateChecker uc;
-    private DbKeepAlive dbKeepAlive;
+    private CreateTables createTables = new CreateTables(this);
+    private DbKeepAlive dbKeepAlive = new DbKeepAlive(this);
+    private RewardsGui rewardsGui = new RewardsGui(this);
+
 
     @Override
     public void onEnable() {
         // Plugin startup logic
+
         this.getCommand("addkey").setExecutor(new AddKey(this));
         this.getCommand("removekey").setExecutor(new RemoveKey(this));
         this.getCommand("configurerewards").setExecutor(new ConfigureRewards(this));
-        this.getCommand("testrewards").setExecutor(new TestRewards(this));
+        this.getCommand("issuereward").setExecutor(new IssueReward(this));
+        this.getCommand("ttreasurereload").setExecutor(new TTreasureReload(this));
 
 
-        getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+        getServer().getPluginManager().registerEvents(new ConfigureListener(this), this);
+        getServer().getPluginManager().registerEvents(new OpenRewardsGuiListener(this), this);
+        getServer().getPluginManager().registerEvents(new TicketSelectGuiListener(this), this);
+
         getConfig().options().copyDefaults(true);
         getConfig().set("version", this.getDescription().getVersion());
         saveConfig();
 
-
-        this.dbKeepAlive = new DbKeepAlive(this);
         this.uc = new UpdateChecker(this);
-        uc.getCheckDownloadURL();
+        //uc.getCheckDownloadURL();
 
-        host = getConfig().getString("host");
-        port = getConfig().getInt("port");
-        database = getConfig().getString("database");
-        username = getConfig().getString("username");
-        password = getConfig().getString("password");
-        table = getConfig().getString("table");
+        host = getConfig().getString("connection.host");
+        port = getConfig().getInt("connection.port");
+        database = getConfig().getString("connection.database");
+        username = getConfig().getString("connection.username");
+        password = getConfig().getString("connection.password");
+        table = getConfig().getString("connection.table");
+        /*
+        System.out.println(host);
+        System.out.println(port);
+        System.out.println(table);
+        System.out.println(database);
+        System.out.println("password");
+        */
 
 
         try {
             openConnection();
             Statement statement = connection.createStatement();
+            connection.close();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            makeLog(e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            int doesNothing = 1;
+            makeLog(e);
         }
 
-        dbKeepAlive.dbKeepAlive();
-
+        /*if (getServer().getName().equalsIgnoreCase("hub")) {
+            createTables.createTable();
+        }*/
+        //dbKeepAlive.dbKeepAlive();
     }
 
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            makeLog(e);
+        }
     }
 
 
     public Connection connection;
     private String host, database, username, password;
     private int port;
-    public String table = getConfig().getString("table");
+    public String table = getConfig().getString("connection.table");
+
+    public String badge = ChatColor.translateAlternateColorCodes('&', getConfig().getString("msg.badge") + "");
+    public String err = badge + ChatColor.translateAlternateColorCodes('&', getConfig().getString("msg.err") + "");
+    public String badCommand = err + ChatColor.translateAlternateColorCodes('&', getConfig().getString("msg.badCommand") + "");
 
 
     public void openConnection() throws SQLException, ClassNotFoundException {
@@ -91,7 +111,26 @@ public final class TreeboTreasures extends JavaPlugin {
                 return;
             }
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, this.username, this.password);
+            connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
+        }
+    }
+
+    public void createConnection(){
+        try {
+            openConnection();
+            Statement statement = connection.createStatement();
+         } catch (ClassNotFoundException e) {
+            makeLog(e);
+        } catch (SQLException e) {
+            makeLog(e);
+        }
+    }
+
+    public void closeConnection(){
+        try {
+            connection.close();
+        }  catch (SQLException e) {
+            makeLog(e);
         }
     }
 
@@ -116,15 +155,5 @@ public final class TreeboTreasures extends JavaPlugin {
     public static boolean isNumeric(String str) {
         return str.matches("\\d+");
     }
-
-    public String getServerName(Entity e) {
-        String server = getConfig().getString("serverName");
-        if (server.toLowerCase().contains("sky")) {
-            server = e.getWorld().getName().split("_")[0].split("-")[0];
-        }
-        return server;
-    }
-
-
 
 }

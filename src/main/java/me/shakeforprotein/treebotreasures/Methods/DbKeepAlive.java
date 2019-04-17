@@ -1,4 +1,4 @@
-package me.shakeforprotein.treebotreasures;
+package me.shakeforprotein.treebotreasures.Methods;
 
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
 import org.bukkit.Bukkit;
@@ -15,8 +15,7 @@ public class DbKeepAlive {
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(pl, new Runnable() {
             public void run() {
                 try {
-
-                    pl.connection.createStatement().executeQuery("SELECT * FROM `" + pl.getConfig().getString("table") + "` WHERE ID!='0'");
+                    pl.connection.createStatement().executeQuery("SELECT * FROM `" + pl.table + "` WHERE ID!='0'");
                     dbKeepAlive();
                 } catch (NullPointerException e) {
                     pl.makeLog(e);
@@ -25,6 +24,6 @@ public class DbKeepAlive {
                     pl.makeLog(e);
                 }
             }
-        }, 36000L);
+        }, 6000L);
     }
 }
