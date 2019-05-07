@@ -17,6 +17,29 @@ categories:
   legendary: 'legendary.yml'
   mythic: 'mythic.yml'
 
+gui:
+  rows: 3
+  title: '&3&l[&3Treebo Treasures&3&l]&r'
+  countLore: '.&a You have -* &6{keyCount} *- &c&l&n{keyType}&a Keys remaining'
+  filler: LIGHT_BLUE_STAINED_GLASS_PANE
+  items:
+    common:
+      material: IRON_BLOCK
+      position: 11
+      title: '&f&lCommon &rKey'
+    uncommon:
+      material: GOLD_BLOCK
+      position: 12
+      title: '&e&lUncommon &rKey'
+    legendary:
+      material: DIAMOND_BLOCK
+      position: 13
+      title: '&b&lLegendary &rKey'
+    epic:
+      material: PURPUR_BLOCK
+      position: 14
+      title: '&5&lEpic &rKey'
+
 #Events will change the loot table in their given month.
 events:
   1:
