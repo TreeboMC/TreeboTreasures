@@ -21,18 +21,16 @@ public class OpenRewardsGuiListener implements Listener {
     private TreeboTreasures pl;
 
     public OpenRewardsGuiListener(TreeboTreasures main){
-        pl = main;
+        this.pl = main;
     }
 
 
 
     @EventHandler
-    public void setOpenerLocationListener(PlayerInteractEvent e) {
+    public void openGuiListener(PlayerInteractEvent e) {
         RewardsGui rewardsGui = new RewardsGui(pl);
         Player p = e.getPlayer();
 
-        ItemStack pMain = p.getInventory().getItemInMainHand();
-        ItemStack pOff = p.getInventory().getItemInOffHand();
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getHand() == EquipmentSlot.HAND) {
             Block clickedBlock = e.getClickedBlock();
             if (clickedBlock.getState() instanceof Skull) {

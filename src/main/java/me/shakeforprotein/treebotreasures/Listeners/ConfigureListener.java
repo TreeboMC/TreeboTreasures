@@ -23,8 +23,8 @@ public class ConfigureListener implements Listener {
     private void onInventoryClose(InventoryCloseEvent e){
         String invFilename = "";
         for(String item : pl.getConfig().getConfigurationSection("categories").getKeys(false)){
-            if(e.getInventory().getTitle().equalsIgnoreCase(item)){
-                invFilename = e.getInventory().getTitle();
+            if(e.getView().getTitle().equalsIgnoreCase(item)){
+                invFilename = e.getView().getTitle();
                 File tableFolder = new File(pl.getDataFolder() + File.separator + "lootTables");
                 File lootFile = new File(tableFolder, File.separator + invFilename + ".yml");
                 FileConfiguration lootMenu = YamlConfiguration.loadConfiguration(lootFile);

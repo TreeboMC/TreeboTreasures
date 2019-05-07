@@ -2,6 +2,7 @@ package me.shakeforprotein.treebotreasures;
 
 import me.shakeforprotein.treebotreasures.Commands.*;
 import me.shakeforprotein.treebotreasures.Guis.RewardsGui;
+import me.shakeforprotein.treebotreasures.Listeners.JoinListener;
 import me.shakeforprotein.treebotreasures.Listeners.OpenRewardsGuiListener;
 import me.shakeforprotein.treebotreasures.Listeners.TicketSelectGuiListener;
 import me.shakeforprotein.treebotreasures.Methods.CreateTables;
@@ -24,10 +25,11 @@ public final class TreeboTreasures extends JavaPlugin {
     private CreateTables createTables = new CreateTables(this);
     private DbKeepAlive dbKeepAlive = new DbKeepAlive(this);
     private RewardsGui rewardsGui = new RewardsGui(this);
-
+    public TreeboTreasures main = this;
 
     @Override
     public void onEnable() {
+        instance = this;
         // Plugin startup logic
 
         this.getCommand("addkey").setExecutor(new AddKey(this));
@@ -35,11 +37,15 @@ public final class TreeboTreasures extends JavaPlugin {
         this.getCommand("configurerewards").setExecutor(new ConfigureRewards(this));
         this.getCommand("issuereward").setExecutor(new IssueReward(this));
         this.getCommand("ttreasurereload").setExecutor(new TTreasureReload(this));
+        this.getCommand("ttreasuresave").setExecutor(new SaveConfig(this));
+
 
 
         getServer().getPluginManager().registerEvents(new ConfigureListener(this), this);
         getServer().getPluginManager().registerEvents(new OpenRewardsGuiListener(this), this);
         getServer().getPluginManager().registerEvents(new TicketSelectGuiListener(this), this);
+        getServer().getPluginManager().registerEvents(new JoinListener(this), this);
+
 
         getConfig().options().copyDefaults(true);
         getConfig().set("version", this.getDescription().getVersion());
@@ -90,6 +96,7 @@ public final class TreeboTreasures extends JavaPlugin {
         }
     }
 
+    public static TreeboTreasures instance;
 
     public Connection connection;
     private String host, database, username, password;

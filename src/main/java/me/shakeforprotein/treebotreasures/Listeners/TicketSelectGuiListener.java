@@ -1,5 +1,6 @@
 package me.shakeforprotein.treebotreasures.Listeners;
 
+import me.shakeforprotein.treebotreasures.Guis.RewardsGui;
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -11,14 +12,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 public class TicketSelectGuiListener implements Listener {
 
     private TreeboTreasures pl;
+    private RewardsGui rewardsGui;
 
     public TicketSelectGuiListener(TreeboTreasures main){
         this.pl = main;
+        this.rewardsGui = new RewardsGui(pl);
     }
 
     @EventHandler
     private void useRewardsGui(InventoryClickEvent e){
-        String invName = e.getClickedInventory().getTitle();
+        String invName = e.getView().getTitle();
         Player p = (Player) e.getWhoClicked();
         invName = ChatColor.stripColor(invName);
         int slot = e.getSlot();
@@ -28,10 +31,9 @@ public class TicketSelectGuiListener implements Listener {
             for(String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)){
                 if(slot == pl.getConfig().getInt("gui.items." + menuItem + ".position")){
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "issuereward " + p.getName() + " " + menuItem);
+                    rewardsGui.rewardsGui(p);
                 }
             }
-
-
         }
     }
 }

@@ -26,6 +26,8 @@ commands:
     usage: <command> <playername> <keytype>
   ttreasurereload:
     permission: tbtreasures.reload
+  ttreasuresave:
+    permission: tbtreasures.reload
 
 permissions:
   tbtreasures.addkey:
