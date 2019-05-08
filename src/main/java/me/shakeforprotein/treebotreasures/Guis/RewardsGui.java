@@ -31,7 +31,7 @@ public class RewardsGui {
         for (int slot = 0; slot < thisInv.getSize(); slot++) {
             ItemStack fillerItem = new ItemStack(Material.valueOf(pl.getConfig().getString("gui.filler")));
             ItemMeta fillMeta = fillerItem.getItemMeta();
-            fillMeta.setDisplayName("");
+            fillMeta.setDisplayName(" ");
             fillerItem.setItemMeta(fillMeta);
             thisInv.setItem(slot, fillerItem);
         }

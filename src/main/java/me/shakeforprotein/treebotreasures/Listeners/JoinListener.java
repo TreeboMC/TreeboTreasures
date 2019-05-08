@@ -11,33 +11,60 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class JoinListener implements Listener {
 
     private TreeboTreasures pl = TreeboTreasures.instance;
 
-    public JoinListener(TreeboTreasures main){
+    public JoinListener(TreeboTreasures main) {
         this.pl = main;
     }
 
+    private HashMap joinHash = new HashMap<UUID, Player>();
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        Bukkit.getServer().getScheduler().runTaskAsynchronously(pl, new Runnable() {
+        if(joinHash.containsKey(e.getPlayer().getUniqueId())){
+            joinHash.remove(e.getPlayer().getUniqueId());
+        }
+        for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
+            pl.getConfig().set("keys." + e.getPlayer().getUniqueId() + "." + menuItem.toUpperCase(), 0);
+        }
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(pl, new Runnable() {
+            @Override
             public void run() {
-                try {
-                    Player p = e.getPlayer();
-                    pl.openConnection();
-                    ResultSet results = pl.connection.createStatement().executeQuery("SELECT * FROM `" + pl.table + "` WHERE `UUID` = '" + p.getUniqueId() + "'");
-                    while (results.next()) {
-                        for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
-                            pl.getConfig().set("keys." + p.getUniqueId() + "." + menuItem.toUpperCase(), results.getInt(menuItem));
+                Bukkit.getServer().getScheduler().runTaskAsynchronously(pl, new Runnable() {
+                    public void run() {
+                        try {
+                            Player p = e.getPlayer();
+                            pl.openConnection();
+
+                            ResultSet exists = pl.connection.createStatement().executeQuery("SELECT Count(*) AS COUNT FROM `TreeboTreasures` WHERE UUID = '" + p.getUniqueId() + "'");
+                            while (exists.next()){
+                                if(exists.getInt("COUNT") < 1){
+                                    System.out.println(pl.badge + "Player not found in database. Adding new entry");
+                                    int insert = pl.connection.createStatement().executeUpdate("INSERT INTO `" + pl.table + "` (UUID, IGNAME) VALUES ('" + p.getUniqueId() + "','" + p.getName() + "');");
+                                }
+                            }
+
+                            ResultSet results = pl.connection.createStatement().executeQuery("SELECT * FROM `" + pl.table + "` WHERE `UUID` = '" + p.getUniqueId() + "'");
+                            while (results.next()) {
+                                for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
+                                    pl.getConfig().set("keys." + p.getUniqueId() + "." + menuItem.toUpperCase(), results.getInt(menuItem));
+                                }
+                            }
+                            if(p.isOnline()){
+                                joinHash.put(p.getUniqueId(), p);
+                            }
+                        } catch (Exception err) {
+                            pl.makeLog(err);
                         }
                     }
-                } catch (Exception err) {
-                    pl.makeLog(err);
-                }
+                });
             }
-        });
+        }, 100L);
     }
 
     @EventHandler
@@ -46,24 +73,28 @@ public class JoinListener implements Listener {
             public void run() {
                 try {
                     Player p = e.getPlayer();
-                    pl.openConnection();
-                    String zeroString = "";
-                    for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
-                        if (pl.getConfig().get("keys." + p.getUniqueId()) != null) {
-                            if(pl.getConfig().get("keys." + p.getUniqueId() + "." + menuItem.toUpperCase()) != null){
-                                zeroString += "" + menuItem + " = " + pl.getConfig().getInt("keys." + p.getUniqueId() + "." + menuItem.toUpperCase()) + ", ";
+                    if (joinHash.containsKey(p.getUniqueId())) {
+                        pl.openConnection();
+                        String zeroString = "";
+                        for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
+                            if (pl.getConfig().get("keys." + p.getUniqueId()) != null) {
+                                if (pl.getConfig().get("keys." + p.getUniqueId() + "." + menuItem.toUpperCase()) != null) {
+                                    zeroString += "" + menuItem + " = " + pl.getConfig().getInt("keys." + p.getUniqueId() + "." + menuItem.toUpperCase()) + ", ";
+                                }
+                            } else {
+                                p.sendMessage("ERROR");
+                                break;
                             }
-                        } else {
-                            p.sendMessage("ERROR");
-                            break;
                         }
+                        zeroString = zeroString.replaceAll(", $", "");
+                        System.out.println("UPDATE `" + pl.table + "` SET " + zeroString + " WHERE `UUID` = '" + p.getUniqueId() + "'");
+                        int results = pl.connection.createStatement().executeUpdate("UPDATE `" + pl.table + "` SET " + zeroString + " WHERE `UUID` = '" + p.getUniqueId() + "'");
+                        for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
+                            pl.getConfig().set("keys." + p.getUniqueId() + "." + menuItem.toUpperCase(), 0);
+                        }
+                        pl.saveConfig();
+                        joinHash.remove(p.getUniqueId());
                     }
-                    zeroString = zeroString.replaceAll(", $", "");
-                    int results = pl.connection.createStatement().executeUpdate("UPDATE `" + pl.table + "` SET " + zeroString + " WHERE `UUID` = '" + p.getUniqueId() + "'");
-                    for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
-                        pl.getConfig().set("keys." + p.getUniqueId() + "." + menuItem.toUpperCase(), 0);
-                    }
-                    pl.saveConfig();
                 } catch (Exception err) {
                     pl.makeLog(err);
                 }
