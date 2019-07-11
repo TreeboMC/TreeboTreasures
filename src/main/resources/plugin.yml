@@ -8,6 +8,13 @@ description: An easy to use rewards plugin, featuring configurable reward tiers 
 website: treebo.games/minecraft
 
 commands:
+  treasuresgui:
+    description: Opens the treasures gui
+    usage: <command>
+  distributekeys:
+    permission: tbtreasures.addkey
+    description: Distributes keys to all players on a server.
+    usage: <command> <keytype> <amount>
   addkey:
     permission: tbtreasures.addkey
     description: Allows player to grant reward keys to players
@@ -20,6 +27,8 @@ commands:
     permission: tbtreasures.configure
     description: Allows player to grant reward keys to players
     usage: <command> <keytype>
+  showrewards:
+    description: Allows player to grant reward keys to players
   issuereward:
     permission: tbtreasures.reward
     description: Issues player with reward of a specified key type. Note this will cost them a key.

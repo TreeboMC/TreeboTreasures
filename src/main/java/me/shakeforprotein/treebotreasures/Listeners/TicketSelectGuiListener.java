@@ -20,7 +20,7 @@ public class TicketSelectGuiListener implements Listener {
     }
 
     @EventHandler
-    private void useRewardsGui(InventoryClickEvent e){
+    private void useRewardsGui(InventoryClickEvent e) {
         String invName = e.getView().getTitle();
         Player p = (Player) e.getWhoClicked();
         invName = ChatColor.stripColor(invName);
@@ -28,12 +28,15 @@ public class TicketSelectGuiListener implements Listener {
         if(invName.equalsIgnoreCase(ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("gui.title").replace("{badge}", pl.badge))))){
             e.setCancelled(true);
 
-            for(String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)){
-                if(slot == pl.getConfig().getInt("gui.items." + menuItem + ".position")){
+            for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
+                if (slot == pl.getConfig().getInt("gui.items." + menuItem + ".position")) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "issuereward " + p.getName() + " " + menuItem);
                     rewardsGui.rewardsGui(p);
                 }
             }
+        }
+        else if(invName.equalsIgnoreCase(ChatColor.RED + pl.getConfig().getString("gui.title"))){
+            e.setCancelled(true);
         }
     }
 }

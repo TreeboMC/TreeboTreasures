@@ -25,6 +25,7 @@ public final class TreeboTreasures extends JavaPlugin {
     private CreateTables createTables = new CreateTables(this);
     private DbKeepAlive dbKeepAlive = new DbKeepAlive(this);
     private RewardsGui rewardsGui = new RewardsGui(this);
+
     public TreeboTreasures main = this;
 
     @Override
@@ -38,6 +39,9 @@ public final class TreeboTreasures extends JavaPlugin {
         this.getCommand("issuereward").setExecutor(new IssueReward(this));
         this.getCommand("ttreasurereload").setExecutor(new TTreasureReload(this));
         this.getCommand("ttreasuresave").setExecutor(new SaveConfig(this));
+        this.getCommand("showrewards").setExecutor(new ShowRewards(this));
+        this.getCommand("distributekeys").setExecutor(new DistributeKeys(this));
+        this.getCommand("treasuresgui").setExecutor(new TreasuresGui(this));
 
 
 

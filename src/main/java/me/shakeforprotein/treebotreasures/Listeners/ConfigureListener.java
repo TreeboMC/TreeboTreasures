@@ -1,11 +1,13 @@
 package me.shakeforprotein.treebotreasures.Listeners;
 
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -17,6 +19,15 @@ public class ConfigureListener implements Listener {
 
     public ConfigureListener(TreeboTreasures main){
         this.pl = main;
+    }
+
+    @EventHandler
+    private void onInventoryInteract(InventoryInteractEvent e){
+        for(String item : pl.getConfig().getConfigurationSection("categories").getKeys(false)) {
+            if (e.getView().getTitle().equalsIgnoreCase(item)) {
+                e.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler

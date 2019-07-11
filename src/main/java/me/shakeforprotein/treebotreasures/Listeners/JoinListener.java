@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class JoinListener implements Listener {
 
-    private TreeboTreasures pl = TreeboTreasures.instance;
+    private TreeboTreasures pl;
 
     public JoinListener(TreeboTreasures main) {
         this.pl = main;

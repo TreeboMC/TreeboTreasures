@@ -35,6 +35,7 @@ public class AddKey implements CommandExecutor {
                 }
                 int newKeys = currentKeys + Integer.parseInt(args[2]);
                 pl.getConfig().set("keys." + uuid + "." + type, newKeys);
+                target.sendMessage("You have received " + amount + " " + type + " key(s)");
             } else {
                 sender.sendMessage(pl.err + " Third argument must be a number.");
             }
