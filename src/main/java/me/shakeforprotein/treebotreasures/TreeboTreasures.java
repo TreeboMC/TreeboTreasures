@@ -98,6 +98,14 @@ public final class TreeboTreasures extends JavaPlugin {
         } catch (SQLException e) {
             makeLog(e);
         }
+        for(String key : getConfig().getConfigurationSection("keys").getKeys(false)){
+            for(String keyType: getConfig().getConfigurationSection("keys." + key).getKeys(false)){
+                getConfig().set("keys." + key + "." + keyType, null);
+            }
+            getConfig().set("keys." + key, null);
+            saveConfig();
+            System.out.println(badge + "Removed " + key + " keys from config.");
+        }
     }
 
     public static TreeboTreasures instance;

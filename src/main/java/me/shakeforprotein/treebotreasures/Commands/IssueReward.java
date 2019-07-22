@@ -107,7 +107,12 @@ public class IssueReward implements CommandExecutor {
         if (success) {
             Player p = Bukkit.getPlayer(args[0]);
             if(receivedItem != null) {
+                if(receivedItem.hasItemMeta() && receivedItem.getItemMeta().hasDisplayName()){
                 p.sendMessage(pl.badge + "You have " + (keys - 1) + " " + args[1] + " Keys remaining, and received " + ChatColor.GOLD + receivedItem.getAmount() + ChatColor.RESET + " X " + ChatColor.GOLD + receivedItem.getItemMeta().getDisplayName());
+                }
+                else{
+                    p.sendMessage(pl.badge + "You have " + (keys - 1) + " " + args[1] + " Keys remaining, and received " + ChatColor.GOLD + receivedItem.getAmount() + ChatColor.RESET + " X " + ChatColor.GOLD + receivedItem.getType().name());
+                }
             }
             else{
                 p.sendMessage(pl.badge + "You have " + (keys - 1) + " " + args[1] + " Keys");

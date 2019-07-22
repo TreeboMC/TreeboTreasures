@@ -90,7 +90,8 @@ public class JoinListener implements Listener {
                         System.out.println("UPDATE `" + pl.table + "` SET " + zeroString + " WHERE `UUID` = '" + p.getUniqueId() + "'");
                         int results = pl.connection.createStatement().executeUpdate("UPDATE `" + pl.table + "` SET " + zeroString + " WHERE `UUID` = '" + p.getUniqueId() + "'");
                         for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
-                            pl.getConfig().set("keys." + p.getUniqueId() + "." + menuItem.toUpperCase(), 0);
+                            //pl.getConfig().set("keys." + p.getUniqueId() + "." + menuItem.toUpperCase(), 0);
+                            pl.getConfig().set("keys." + p.getUniqueId(), null);
                         }
                         pl.saveConfig();
                         joinHash.remove(p.getUniqueId());
