@@ -25,6 +25,7 @@ public final class TreeboTreasures extends JavaPlugin {
     private CreateTables createTables = new CreateTables(this);
     private DbKeepAlive dbKeepAlive = new DbKeepAlive(this);
     private RewardsGui rewardsGui = new RewardsGui(this);
+    public JoinListener joinListener = new JoinListener(this);
 
     public TreeboTreasures main = this;
 
@@ -48,7 +49,7 @@ public final class TreeboTreasures extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ConfigureListener(this), this);
         getServer().getPluginManager().registerEvents(new OpenRewardsGuiListener(this), this);
         getServer().getPluginManager().registerEvents(new TicketSelectGuiListener(this), this);
-        getServer().getPluginManager().registerEvents(new JoinListener(this), this);
+        getServer().getPluginManager().registerEvents(joinListener, this);
 
 
         getConfig().options().copyDefaults(true);

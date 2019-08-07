@@ -1,6 +1,8 @@
 package me.shakeforprotein.treebotreasures.Commands;
 
+import me.shakeforprotein.treebotreasures.Listeners.JoinListener;
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -10,6 +12,7 @@ import org.bukkit.entity.Player;
 public class AddKey implements CommandExecutor {
 
     private TreeboTreasures pl;
+    private JoinListener joinListener;
 
     public AddKey(TreeboTreasures main) {
         this.pl = main;
@@ -17,31 +20,41 @@ public class AddKey implements CommandExecutor {
 
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
-
-        if(args.length == 3)        {
-            if (pl.isNumeric(args[2])) {
-                Player target = pl.getServer().getPlayer(args[0]);
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        joinListener = pl.joinListener;
+        if (args.length == 3) {
+            if (pl.isNumeric(args[2])) { // received a number as the third input
+                OfflinePlayer target = pl.getServer().getOfflinePlayer(args[0]);
                 String uuid = target.getUniqueId().toString();
                 String name = target.getName();
                 String type = args[1].toUpperCase();
                 String amount = args[2];
                 int currentKeys = 0;
-                if(pl.getConfig().get("keys." + uuid + "." + type) != null){
-                    currentKeys = pl.getConfig().getInt("keys." + uuid + "." + type);
+                if (joinListener.joinHash.containsKey(target.getUniqueId())) {
+                    if (pl.getConfig().get("keys." + uuid + "." + type) != null) {
+                        currentKeys = pl.getConfig().getInt("keys." + uuid + "." + type);
+                    }
+                    int newKeys = currentKeys + Integer.parseInt(args[2]);
+                    pl.getConfig().set("keys." + uuid + "." + type, newKeys);
+                    if(target instanceof Player) {
+                        ((Player) target).sendMessage("You have received " + amount + " " + type + " key(s).");
+                    }
+                    sender.sendMessage(pl.badge + "Successfully Assigned key(s)");
+                    pl.saveConfig();
                 }
-                int newKeys = currentKeys + Integer.parseInt(args[2]);
-                pl.getConfig().set("keys." + uuid + "." + type, newKeys);
-                target.sendMessage("You have received " + amount + " " + type + " key(s)");
+                else{
+                    sender.sendMessage("Player keys not yet loaded. Caching keys for later.");
+                    if(pl.getConfig().get("cachedKeys." + uuid + "." + type) != null){
+                        pl.getConfig().set("cachedKeys." + uuid + "." + type, Integer.parseInt(args[2]) + pl.getConfig().getInt("cachedKKeys." + uuid + "." + type));
+                    }
+                    else{
+                        pl.getConfig().set("cachedKeys." + uuid + "." + type, Integer.parseInt(args[2]));
+                    }
+                }
             } else {
                 sender.sendMessage(pl.err + " Third argument must be a number.");
             }
-            sender.sendMessage(pl.badge + "Successfully Assigned key(s)");
-            pl.saveConfig();
-        }
-        else
-
-        {
+        } else {
             sender.sendMessage(pl.badCommand + "/AddKey <Playername> <KeyType> <Quantity>");
         }
 

@@ -22,7 +22,7 @@ public class JoinListener implements Listener {
         this.pl = main;
     }
 
-    private HashMap joinHash = new HashMap<UUID, Player>();
+    public HashMap joinHash = new HashMap<UUID, Player>();
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
@@ -53,7 +53,16 @@ public class JoinListener implements Listener {
                             while (results.next()) {
                                 for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
                                     pl.getConfig().set("keys." + p.getUniqueId() + "." + menuItem.toUpperCase(), results.getInt(menuItem));
+                                     if(pl.getConfig().get("cachedKeys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase()) != null){
+                                        int cachedKey = pl.getConfig().getInt("cachedKeys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase());
+                                        int currentKeys = pl.getConfig().getInt(    "keys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase());
+                                        int newKeys = cachedKey + currentKeys;
+                                        pl.getConfig().set("keys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase(), newKeys);
+                                        pl.getConfig().set("cachedKeys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase(), null);
+                                    }
                                 }
+                                pl.getConfig().set("cachedKeys." + p.getUniqueId().toString(), null);
+
                             }
                             if(p.isOnline()){
                                 joinHash.put(p.getUniqueId(), p);
