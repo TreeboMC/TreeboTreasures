@@ -38,7 +38,7 @@ public class ShowRewards implements CommandExecutor {
                     sender.sendMessage(pl.err + "No such Loot table");
                 }
 
-                Inventory lootInventory = Bukkit.createInventory(null, 54, ChatColor.RED + args[0]);
+                Inventory lootInventory = Bukkit.createInventory(null, 54, "Possible Rewards: " + args[0]);
 
                 if (lootMenu.getConfigurationSection("items") != null) {
                     for (String item : lootMenu.getConfigurationSection("items").getKeys(false)) {

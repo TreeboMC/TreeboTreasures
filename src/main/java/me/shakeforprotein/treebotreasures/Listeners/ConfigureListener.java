@@ -4,10 +4,11 @@ import me.shakeforprotein.treebotreasures.TreeboTreasures;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -24,7 +25,37 @@ public class ConfigureListener implements Listener {
     @EventHandler
     private void onInventoryInteract(InventoryInteractEvent e){
         for(String item : pl.getConfig().getConfigurationSection("categories").getKeys(false)) {
-            if (e.getView().getTitle().equalsIgnoreCase(item)) {
+            if (e.getView().getTitle().equalsIgnoreCase(item) || e.getView().getTitle().equalsIgnoreCase(ChatColor.RED + ChatColor.stripColor(item))) {
+                e.setCancelled(true);
+            }
+            if(e.getView().getTitle().startsWith("Possible Rewards:")){
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    private void onInventoryPickup(InventoryPickupItemEvent e){
+        for(HumanEntity p : e.getInventory().getViewers()){
+            if(p.getOpenInventory().getTitle().startsWith("Possible Rewards:")){
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    private void onInventoryMove(InventoryMoveItemEvent e){
+        for(HumanEntity p : e.getDestination().getViewers()){
+            if(p.getOpenInventory().getTitle().startsWith("Possible Rewards:")){
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    private void onInventoryRoll(InventoryClickEvent e){
+        for(HumanEntity p : e.getInventory().getViewers()){
+            if(p.getOpenInventory().getTitle().startsWith("Possible Rewards:")){
                 e.setCancelled(true);
             }
         }
