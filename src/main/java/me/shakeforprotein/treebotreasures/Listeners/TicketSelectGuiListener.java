@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class TicketSelectGuiListener implements Listener {
@@ -30,8 +31,13 @@ public class TicketSelectGuiListener implements Listener {
 
             for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
                 if (slot == pl.getConfig().getInt("gui.items." + menuItem + ".position")) {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "issuereward " + p.getName() + " " + menuItem);
-                    rewardsGui.rewardsGui(p);
+                    if(e.getClick() == ClickType.LEFT) {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "issuereward " + p.getName() + " " + menuItem);
+                        rewardsGui.rewardsGui(p);
+                    }
+                    else if(e.getClick() == ClickType.RIGHT){
+                        Bukkit.dispatchCommand(e.getWhoClicked(), "showrewards " + menuItem );
+                    }
                 }
             }
         }

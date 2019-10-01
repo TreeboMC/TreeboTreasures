@@ -2,7 +2,6 @@ package me.shakeforprotein.treebotreasures.Commands;
 
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,26 +29,24 @@ public class ShowRewards implements CommandExecutor {
                 File lootFile = new File(tableFolder, File.separator + pl.getConfig().getString("categories." + args[0]));
                 FileConfiguration lootMenu = YamlConfiguration.loadConfiguration(lootFile);
 
-                if(!tableFolder.exists()){
-                    boolean rslt = tableFolder.mkdir();
-                }
-
                 if (!lootFile.exists()) {
-                    sender.sendMessage(pl.err + "No such Loot table");
+                    sender.sendMessage(pl.err + " No such Loot table");
                 }
+                else {
 
-                Inventory lootInventory = Bukkit.createInventory(null, 54, "Possible Rewards: " + args[0]);
+                    Inventory lootInventory = Bukkit.createInventory(null, 54, "Possible Rewards: " + args[0]);
 
-                if (lootMenu.getConfigurationSection("items") != null) {
-                    for (String item : lootMenu.getConfigurationSection("items").getKeys(false)) {
-                        if(lootMenu.get("items." + item + ".stack") != null){
-                            ItemStack newItem = lootMenu.getItemStack("items." + item + ".stack");
-                            lootInventory.setItem(lootMenu.getInt("items." + item + ".position"),newItem);
+                    if (lootMenu.getConfigurationSection("items") != null) {
+                        for (String item : lootMenu.getConfigurationSection("items").getKeys(false)) {
+                            if (lootMenu.get("items." + item + ".stack") != null) {
+                                ItemStack newItem = lootMenu.getItemStack("items." + item + ".stack");
+                                lootInventory.setItem(lootMenu.getInt("items." + item + ".position"), newItem);
+                            }
                         }
                     }
-                }
-                if (sender instanceof Player) {
-                    ((Player) sender).openInventory(lootInventory);
+                    if (sender instanceof Player) {
+                        ((Player) sender).openInventory(lootInventory);
+                    }
                 }
             } else {
                 sender.sendMessage("Invalid arguments");

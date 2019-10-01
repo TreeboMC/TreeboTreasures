@@ -9,8 +9,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +43,9 @@ public class RewardsGui {
                 keys = pl.getConfig().getInt("keys." + p.getUniqueId() + "." + menuItem.toUpperCase());
             }
             newLore.add(ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("gui.countLore").replace("{keyCount}", keys + "").replace("{keyType}", menuItem)));
+            newLore.add("");
+            newLore.add("Left Click to claim");
+            newLore.add("Right Click to show possible rewards");
             newMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("gui.items." + menuItem + ".title")));
             newMeta.setLore(newLore);
             newItem.setItemMeta(newMeta);

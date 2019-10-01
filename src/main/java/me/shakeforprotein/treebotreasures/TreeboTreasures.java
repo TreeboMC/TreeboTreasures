@@ -1,6 +1,7 @@
 package me.shakeforprotein.treebotreasures;
 
 import me.shakeforprotein.treebotreasures.Commands.*;
+import me.shakeforprotein.treebotreasures.Commands.TabCompleters.TabCompleteShowRewards;
 import me.shakeforprotein.treebotreasures.Guis.RewardsGui;
 import me.shakeforprotein.treebotreasures.Listeners.JoinListener;
 import me.shakeforprotein.treebotreasures.Listeners.OpenRewardsGuiListener;
@@ -26,7 +27,6 @@ public final class TreeboTreasures extends JavaPlugin {
     private DbKeepAlive dbKeepAlive = new DbKeepAlive(this);
     private RewardsGui rewardsGui = new RewardsGui(this);
     public JoinListener joinListener = new JoinListener(this);
-
     public TreeboTreasures main = this;
 
     @Override
@@ -41,6 +41,7 @@ public final class TreeboTreasures extends JavaPlugin {
         this.getCommand("ttreasurereload").setExecutor(new TTreasureReload(this));
         this.getCommand("ttreasuresave").setExecutor(new SaveConfig(this));
         this.getCommand("showrewards").setExecutor(new ShowRewards(this));
+        this.getCommand("showrewards").setTabCompleter(new TabCompleteShowRewards(this));
         this.getCommand("distributekeys").setExecutor(new DistributeKeys(this));
         this.getCommand("treasuresgui").setExecutor(new TreasuresGui(this));
 
@@ -117,7 +118,7 @@ public final class TreeboTreasures extends JavaPlugin {
     public String table = getConfig().getString("connection.table");
 
     public String badge = ChatColor.translateAlternateColorCodes('&', getConfig().getString("msg.badge") + "");
-    public String err = badge + ChatColor.translateAlternateColorCodes('&', getConfig().getString("msg.err") + "");
+    public String err = badge + "" + ChatColor.translateAlternateColorCodes('&', getConfig().getString("msg.error") + "");
     public String badCommand = err + ChatColor.translateAlternateColorCodes('&', getConfig().getString("msg.badCommand") + "");
 
 
