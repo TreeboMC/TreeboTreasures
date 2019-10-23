@@ -1,0 +1,147 @@
+# ==================================== #
+# 
+# TreeboTreasures 0.0.12
+# A better reward solution.
+# (c) ShakeforProtein
+# 
+# ==================================== #
+# 
+# Thank you for using the plugin! 
+# 
+# ==================================== #
+#           Settings 
+# ==================================== #
+
+gui:
+  rows: 3
+  title: '12345'
+  filler: LIGHT_BLUE_STAINED_GLASS_PANE
+  items:
+    R1:
+      Command: addkey [Player] common 1
+      Slot: 1
+      ActiveItem: CHEST_MINECART
+      ActiveItemAmount: 1
+      ActiveItemGlow: true
+      InactiveItem: MINECART
+      InactiveItemAmount: 1
+      InactiveItemGlow: false
+      Heading: '&3Reward Day #1'
+      ActiveLore: '&2Join Treebo every day;&2To get a bigger reward!;'
+      InactiveLore: '&8You joined some days in a row;&8so get now a bigger reward!;;&7Checkout the following rewards.'
+      DaysUntilPlayerCanClaim: 0
+      TimeToClaimFormat: '&8You can claim this reward in &7%days &8days.'
+      CanBeClaimedFormat: '&aYou can get this reward today!'
+      CanBeClaimedTomorrowFormat: '&8You can get this reward tomorrow!'
+    R2:
+      Command: addkey [Player] common 2
+      Slot: 2
+      ActiveItem: CHEST_MINECART
+      ActiveItemAmount: 1
+      ActiveItemGlow: true
+      InactiveItem: MINECART
+      InactiveItemAmount: 1
+      InactiveItemGlow: false
+      Heading: '&3Reward Day #2'
+      ActiveLore: '&2Join Treebo every day;&2To get a bigger reward!;'
+      InactiveLore: '&8You joined some days in a row;&8so get now a bigger reward!;;&7Checkout the following rewards.'
+      DaysUntilPlayerCanClaim: 1
+      TimeToClaimFormat: '&8You can claim this reward in &7%days &8days.'
+      CanBeClaimedFormat: '&aYou can get this reward today!'
+      CanBeClaimedTomorrowFormat: '&8You can get this reward tomorrow!'
+    R3:
+      Command: addkey [Player] common 3
+      Slot: 3
+      ActiveItem: CHEST_MINECART
+      ActiveItemAmount: 1
+      ActiveItemGlow: true
+      InactiveItem: MINECART
+      InactiveItemAmount: 1
+      InactiveItemGlow: false
+      Heading: '&3Reward Day #3'
+      ActiveLore: '&2Join Treebo every day;&2To get a bigger reward!;'
+      InactiveLore: '&8You joined some days in a row;&8so get now a bigger reward!;;&7Checkout the following rewards.'
+      DaysUntilPlayerCanClaim: 2
+      TimeToClaimFormat: '&8You can claim this reward in &7%days &8days.'
+      CanBeClaimedFormat: '&aYou can get this reward today!'
+      CanBeClaimedTomorrowFormat: '&8You can get this reward tomorrow!'
+    R4:
+      Command: addkey [Player] common 4
+      Slot: 4
+      ActiveItem: CHEST_MINECART
+      ActiveItemAmount: 1
+      ActiveItemGlow: true
+      InactiveItem: MINECART
+      InactiveItemAmount: 1
+      InactiveItemGlow: false
+      Heading: '&3Reward Day #4'
+      ActiveLore: '&2Join Treebo every day;&2To get a bigger reward!;'
+      InactiveLore: '&8You joined some days in a row;&8so get now a bigger reward!;;&7Checkout the following rewards.'
+      DaysUntilPlayerCanClaim: 3
+      TimeToClaimFormat: '&8You can claim this reward in &7%days &8days.'
+      CanBeClaimedFormat: '&aYou can get this reward today!'
+      CanBeClaimedTomorrowFormat: '&8You can get this reward tomorrow!'
+    R5:
+      Command: addkey [Player] common 5
+      Slot: 5
+      ActiveItem: CHEST_MINECART
+      ActiveItemAmount: 1
+      ActiveItemGlow: true
+      InactiveItem: MINECART
+      InactiveItemAmount: 1
+      InactiveItemGlow: false
+      Heading: '&3Reward Day #5'
+      ActiveLore: '&2Join Treebo every day;&2To get a bigger reward!;'
+      InactiveLore: '&8You joined some days in a row;&8so get now a bigger reward!;;&7Checkout the following rewards.'
+      DaysUntilPlayerCanClaim: 4
+      TimeToClaimFormat: '&8You can claim this reward in &7%days &8days.'
+      CanBeClaimedFormat: '&aYou can get this reward today!'
+      CanBeClaimedTomorrowFormat: '&8You can get this reward tomorrow!'
+    R6:
+      Command: addkey [Player] common 6
+      Slot: 6
+      ActiveItem: CHEST_MINECART
+      ActiveItemAmount: 1
+      ActiveItemGlow: true
+      InactiveItem: MINECART
+      InactiveItemAmount: 1
+      InactiveItemGlow: false
+      Heading: '&3Reward Day #6'
+      ActiveLore: '&2Join Treebo every day;&2To get a bigger reward!;'
+      InactiveLore: '&8You joined some days in a row;&8so get now a bigger reward!;;&7Checkout the following rewards.'
+      DaysUntilPlayerCanClaim: 5
+      TimeToClaimFormat: '&8You can claim this reward in &7%days &8days.'
+      CanBeClaimedFormat: '&aYou can get this reward today!'
+      CanBeClaimedTomorrowFormat: '&8You can get this reward tomorrow!'
+    R7:
+      Command: addkey [Player] common 7
+      Slot: 7
+      ActiveItem: CHEST_MINECART
+      ActiveItemAmount: 1
+      ActiveItemGlow: true
+      InactiveItem: MINECART
+      InactiveItemAmount: 1
+      InactiveItemGlow: false
+      Heading: '&3Reward Day #7'
+      ActiveLore: '&2Join Treebo every day;&2To get a bigger reward!;'
+      InactiveLore: '&8You joined some days in a row;&8so get now a bigger reward!;;&7Checkout the following rewards.'
+      DaysUntilPlayerCanClaim: 6
+      TimeToClaimFormat: '&8You can claim this reward in &7%days &8days.'
+      CanBeClaimedFormat: '&aYou can get this reward today!'
+      CanBeClaimedTomorrowFormat: '&8You can get this reward tomorrow!'
+    R8:
+      Command: addkey [Player] epic 1
+      Slot: 13
+      ActiveItem: CHEST_MINECART
+      ActiveItemAmount: 1
+      ActiveItemGlow: true
+      InactiveItem: MINECART
+      InactiveItemAmount: 1
+      InactiveItemGlow: false
+      Heading: '&3Reward Day #8'
+      ActiveLore: '&2Join Treebo every day;&2To get a bigger reward!'
+      InactiveLore: '&8You joined some days in a row;&8so get now a bigger reward!;;&7Checkout the following rewards.'
+      DaysUntilPlayerCanClaim: 7
+      TimeToClaimFormat: '&8You can claim this reward in &7%days &8days.'
+      CanBeClaimedFormat: '&aYou can get this reward today!'
+      CanBeClaimedTomorrowFormat: '&8You can get this reward tomorrow!'

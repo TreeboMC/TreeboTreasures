@@ -1,6 +1,7 @@
 package me.shakeforprotein.treebotreasures.Commands.TabCompleters;
 
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -35,8 +36,4 @@ public class TabCompleteShowRewards implements TabCompleter {
         }
         return null;
     }
-
-
-
-
 }

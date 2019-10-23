@@ -8,6 +8,9 @@ description: An easy to use rewards plugin, featuring configurable reward tiers 
 website: treebo.games/minecraft
 
 commands:
+  dailyreward:
+    description: Opens the daily gui
+    usage: <command>
   treasuresgui:
     description: Opens the treasures gui
     usage: <command>

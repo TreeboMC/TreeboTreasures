@@ -66,3 +66,5 @@ events:
     name: ''
   12:
     name: 'christmas'
+
+doDailyRewards: false

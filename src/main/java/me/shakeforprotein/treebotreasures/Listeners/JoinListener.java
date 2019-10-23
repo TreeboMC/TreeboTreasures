@@ -1,16 +1,22 @@
 package me.shakeforprotein.treebotreasures.Listeners;
 
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -26,7 +32,7 @@ public class JoinListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        if(joinHash.containsKey(e.getPlayer().getUniqueId())){
+        if (joinHash.containsKey(e.getPlayer().getUniqueId())) {
             joinHash.remove(e.getPlayer().getUniqueId());
         }
         for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
@@ -42,8 +48,8 @@ public class JoinListener implements Listener {
                             pl.openConnection();
 
                             ResultSet exists = pl.connection.createStatement().executeQuery("SELECT Count(*) AS COUNT FROM `TreeboTreasures` WHERE UUID = '" + p.getUniqueId() + "'");
-                            while (exists.next()){
-                                if(exists.getInt("COUNT") < 1){
+                            while (exists.next()) {
+                                if (exists.getInt("COUNT") < 1) {
                                     System.out.println(pl.badge + "Player not found in database. Adding new entry");
                                     int insert = pl.connection.createStatement().executeUpdate("INSERT INTO `" + pl.table + "` (UUID, IGNAME) VALUES ('" + p.getUniqueId() + "','" + p.getName() + "');");
                                 }
@@ -53,9 +59,9 @@ public class JoinListener implements Listener {
                             while (results.next()) {
                                 for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
                                     pl.getConfig().set("keys." + p.getUniqueId() + "." + menuItem.toUpperCase(), results.getInt(menuItem));
-                                     if(pl.getConfig().get("cachedKeys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase()) != null){
+                                    if (pl.getConfig().get("cachedKeys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase()) != null) {
                                         int cachedKey = pl.getConfig().getInt("cachedKeys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase());
-                                        int currentKeys = pl.getConfig().getInt(    "keys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase());
+                                        int currentKeys = pl.getConfig().getInt("keys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase());
                                         int newKeys = cachedKey + currentKeys;
                                         pl.getConfig().set("keys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase(), newKeys);
                                         pl.getConfig().set("cachedKeys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase(), null);
@@ -64,7 +70,7 @@ public class JoinListener implements Listener {
                                 pl.getConfig().set("cachedKeys." + p.getUniqueId().toString(), null);
 
                             }
-                            if(p.isOnline()){
+                            if (p.isOnline()) {
                                 joinHash.put(p.getUniqueId(), p);
                             }
                         } catch (Exception err) {
@@ -74,7 +80,41 @@ public class JoinListener implements Listener {
                 });
             }
         }, 100L);
+
+        if (pl.getConfig().getBoolean("doDailyRewards")) {
+            File playerFileFolder = new File(pl.getDataFolder() + File.separator + "playerFiles");
+            File playerFile = new File(playerFileFolder, File.separator + e.getPlayer().getUniqueId() + ".yml");
+            FileConfiguration playerYml = YamlConfiguration.loadConfiguration(playerFile);
+
+
+            Player p = e.getPlayer();
+            //Set default values in case they don't exist
+            long timeNow = (System.currentTimeMillis() / 1000) / 60;
+            long lastToken = timeNow;
+            int streak = 0;
+            if (playerYml.get("lastToken") != null) {
+                lastToken = playerYml.getLong("lastToken");
+            }
+            if (playerYml.get("streak") != null) {
+                streak = playerYml.getInt("streak");
+            }
+            if ((timeNow - 3600) > lastToken && ((timeNow - 4800) < lastToken)) {
+                lastToken = timeNow;
+                streak++;
+                p.sendMessage(pl.badge + " You have earned a daily reward. Your current streak is " + streak);
+            } else {
+                boolean doNothing = true;
+            }
+            playerYml.set("lastToken", lastToken);
+            playerYml.set("streak", streak);
+            try {
+                playerYml.save(playerFile);
+            } catch (IOException err) {
+                boolean doNothing = true;
+            }
+        }
     }
+
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent e) {

@@ -4,8 +4,10 @@ import me.shakeforprotein.treebotreasures.TreeboTreasures;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -42,6 +44,7 @@ public class RewardsGui {
             if (pl.getConfig().get("keys." + p.getUniqueId() + "." + menuItem.toUpperCase()) != null) {
                 keys = pl.getConfig().getInt("keys." + p.getUniqueId() + "." + menuItem.toUpperCase());
             }
+
             newLore.add(ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("gui.countLore").replace("{keyCount}", keys + "").replace("{keyType}", menuItem)));
             newLore.add("");
             newLore.add("Left Click to claim");
@@ -49,6 +52,9 @@ public class RewardsGui {
             newMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("gui.items." + menuItem + ".title")));
             newMeta.setLore(newLore);
             newItem.setItemMeta(newMeta);
+            if(keys > 0){
+                pl.addGlow(newItem);
+            }
             thisInv.setItem(position, newItem);
         }
         for (int slot = 0; slot < thisInv.getSize(); slot++) {
@@ -60,6 +66,8 @@ public class RewardsGui {
 
         p.openInventory(thisInv);
     }
+
+
 
     /*
     public void rewardsGui(Player p){

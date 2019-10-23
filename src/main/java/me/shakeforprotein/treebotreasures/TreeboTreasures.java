@@ -11,6 +11,10 @@ import me.shakeforprotein.treebotreasures.Methods.DbKeepAlive;
 import me.shakeforprotein.treebotreasures.UpdateChecker.UpdateChecker;
 import me.shakeforprotein.treebotreasures.Listeners.ConfigureListener;
 import org.bukkit.ChatColor;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -44,7 +48,9 @@ public final class TreeboTreasures extends JavaPlugin {
         this.getCommand("showrewards").setTabCompleter(new TabCompleteShowRewards(this));
         this.getCommand("distributekeys").setExecutor(new DistributeKeys(this));
         this.getCommand("treasuresgui").setExecutor(new TreasuresGui(this));
-
+        if (getConfig().getBoolean("doDailyRewards")) {
+            this.getCommand("dailyreward").setExecutor(new DailyReward(this));
+        }
 
 
         getServer().getPluginManager().registerEvents(new ConfigureListener(this), this);
@@ -175,6 +181,14 @@ public final class TreeboTreasures extends JavaPlugin {
 
     public static boolean isNumeric(String str) {
         return str.matches("\\d+");
+    }
+
+    public void addGlow(ItemStack stack)
+    {
+        ItemMeta meta = stack.getItemMeta();
+        meta.addEnchant( Enchantment.LURE, 1, false );
+        meta.addItemFlags( ItemFlag.HIDE_ENCHANTS );
+        stack.setItemMeta( meta );
     }
 
 }
