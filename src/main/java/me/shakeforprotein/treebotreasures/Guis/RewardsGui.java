@@ -53,7 +53,7 @@ public class RewardsGui {
             newMeta.setLore(newLore);
             newItem.setItemMeta(newMeta);
             if(keys > 0){
-                pl.addGlow(newItem);
+                addGlow(newItem);
             }
             thisInv.setItem(position, newItem);
         }
@@ -67,6 +67,12 @@ public class RewardsGui {
         p.openInventory(thisInv);
     }
 
+    public void addGlow(ItemStack stack) {
+        ItemMeta meta = stack.getItemMeta();
+        meta.addEnchant(Enchantment.LURE, 1, false);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        stack.setItemMeta(meta);
+    }
 
 
     /*

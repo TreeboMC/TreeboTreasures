@@ -106,8 +106,8 @@ public final class TreeboTreasures extends JavaPlugin {
         } catch (SQLException e) {
             makeLog(e);
         }
-        for(String key : getConfig().getConfigurationSection("keys").getKeys(false)){
-            for(String keyType: getConfig().getConfigurationSection("keys." + key).getKeys(false)){
+        for (String key : getConfig().getConfigurationSection("keys").getKeys(false)) {
+            for (String keyType : getConfig().getConfigurationSection("keys." + key).getKeys(false)) {
                 getConfig().set("keys." + key + "." + keyType, null);
             }
             getConfig().set("keys." + key, null);
@@ -142,21 +142,21 @@ public final class TreeboTreasures extends JavaPlugin {
         }
     }
 
-    public void createConnection(){
+    public void createConnection() {
         try {
             openConnection();
             Statement statement = connection.createStatement();
-         } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             makeLog(e);
         } catch (SQLException e) {
             makeLog(e);
         }
     }
 
-    public void closeConnection(){
+    public void closeConnection() {
         try {
             connection.close();
-        }  catch (SQLException e) {
+        } catch (SQLException e) {
             makeLog(e);
         }
     }
@@ -182,13 +182,4 @@ public final class TreeboTreasures extends JavaPlugin {
     public static boolean isNumeric(String str) {
         return str.matches("\\d+");
     }
-
-    public void addGlow(ItemStack stack)
-    {
-        ItemMeta meta = stack.getItemMeta();
-        meta.addEnchant( Enchantment.LURE, 1, false );
-        meta.addItemFlags( ItemFlag.HIDE_ENCHANTS );
-        stack.setItemMeta( meta );
-    }
-
 }

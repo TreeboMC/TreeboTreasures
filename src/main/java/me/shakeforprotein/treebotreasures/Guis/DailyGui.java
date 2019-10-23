@@ -5,8 +5,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -66,17 +68,35 @@ public class DailyGui {
                     ItemMeta newMeta = newItem.getItemMeta();
                     List<String> newLore = new ArrayList<>();
                     newMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + menuItem + ".Heading")));
-                    newLore.add(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + menuItem + ".ActiveLore")));
+                    String configLore = dailyYml.getString("gui.items." + menuItem + ".ActiveLore").replace("some days", playerYml.getInt("streak") +" days");
+                    for(String txt : configLore.split(";")){
+                    newLore.add(ChatColor.translateAlternateColorCodes('&', txt.replace(";","\n")));
+                    }
+                    newLore.add("");
+                    newLore.add(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + menuItem + ".CanBeClaimedFormat")));
                     newMeta.setLore(newLore);
                     newItem.setItemMeta(newMeta);
-                    pl.addGlow(newItem);
+                    addGlow(newItem);
                 }
                 else{
                     newItem = new ItemStack(Material.valueOf(dailyYml.getString("gui.items." + menuItem + ".InactiveItem")), dailyYml.getInt("gui.items." + menuItem + ".InactiveItemAmount"));
                     ItemMeta newMeta = newItem.getItemMeta();
                     List<String> newLore = new ArrayList<>();
+
                     newMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + menuItem + ".Heading")));
-                    newLore.add(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + menuItem + ".InactiveLore")));
+                    String configLore = dailyYml.getString("gui.items." + menuItem + ".InactiveLore").replace("some days", playerYml.getInt("streak") +" days").replace("%days", (1111) +"");
+                    for(String txt : configLore.split(";")){
+                        newLore.add(ChatColor.translateAlternateColorCodes('&', txt));
+                    }
+                    newLore.add("");
+                    int totalDays = dailyYml.getInt("gui.items." + menuItem + ".DaysUntilPlayerCanClaim") - playerYml.getInt("streak");
+                    if(totalDays < 0){
+                        newLore.add(ChatColor.DARK_RED + "You have already claimed this reward");
+
+                    }
+                    else{
+                        newLore.add(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + menuItem + ".TimeToClaimFormat").replace("%days", totalDays + "")));
+                    }
                     newMeta.setLore(newLore);
                     newItem.setItemMeta(newMeta);
 
@@ -101,5 +121,12 @@ public class DailyGui {
         }
 
         p.openInventory(thisInv);
+    }
+
+    public void addGlow(ItemStack stack) {
+        ItemMeta meta = stack.getItemMeta();
+        meta.addEnchant(Enchantment.LURE, 1, false);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        stack.setItemMeta(meta);
     }
 }
