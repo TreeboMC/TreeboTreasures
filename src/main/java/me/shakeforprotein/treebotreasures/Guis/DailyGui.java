@@ -90,7 +90,7 @@ public class DailyGui {
                     }
                     newLore.add("");
                     int totalDays = dailyYml.getInt("gui.items." + menuItem + ".DaysUntilPlayerCanClaim") - playerYml.getInt("streak");
-                    if(totalDays < 0){
+                    if(totalDays < 1){
                         newLore.add(ChatColor.DARK_RED + "You have already claimed this reward");
 
                     }

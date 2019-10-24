@@ -2,12 +2,16 @@ name: TreeboTreasures
 version: ${project.version}
 main: me.shakeforprotein.treebotreasures.TreeboTreasures
 api-version: 1.13
-prefix: [TreeboTreasures]
+prefix: TreeboTreasures
 authors: [ShakeforProtein]
 description: An easy to use rewards plugin, featuring configurable reward tiers and an intuitive admin interface.
 website: treebo.games/minecraft
 
 commands:
+  keyparty:
+    description: gives random players a random key for X cycles on five minute intervals
+    usage: <command> <donator name> <number of cycles>
+    permission: tbtreasures.admin
   dailyreward:
     description: Opens the daily gui
     usage: <command>

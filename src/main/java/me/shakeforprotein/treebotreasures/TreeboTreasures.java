@@ -11,15 +11,9 @@ import me.shakeforprotein.treebotreasures.Methods.DbKeepAlive;
 import me.shakeforprotein.treebotreasures.UpdateChecker.UpdateChecker;
 import me.shakeforprotein.treebotreasures.Listeners.ConfigureListener;
 import org.bukkit.ChatColor;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.sql.*;
 
@@ -48,6 +42,7 @@ public final class TreeboTreasures extends JavaPlugin {
         this.getCommand("showrewards").setTabCompleter(new TabCompleteShowRewards(this));
         this.getCommand("distributekeys").setExecutor(new DistributeKeys(this));
         this.getCommand("treasuresgui").setExecutor(new TreasuresGui(this));
+        this.getCommand("keyparty").setExecutor(new KeyParty(this));
         if (getConfig().getBoolean("doDailyRewards")) {
             this.getCommand("dailyreward").setExecutor(new DailyReward(this));
         }
@@ -62,6 +57,8 @@ public final class TreeboTreasures extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         getConfig().set("version", this.getDescription().getVersion());
         saveConfig();
+        createDefaultFiles("dailyRewards.yml");
+
 
         this.uc = new UpdateChecker(this);
         //uc.getCheckDownloadURL();
@@ -182,4 +179,12 @@ public final class TreeboTreasures extends JavaPlugin {
     public static boolean isNumeric(String str) {
         return str.matches("\\d+");
     }
+
+    public void createDefaultFiles(String filePath) {
+        File userFile = new File(this.getDataFolder(), filePath);
+        if (!userFile.exists()) {
+            this.saveResource(filePath, false);
+        }
+    }
 }
+
