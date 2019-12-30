@@ -11,6 +11,8 @@ connection:
   password: ''
   table: 'TreeboTreasures'
 
+bstatsIntegration: true
+
 categories:
   common: 'common.yml'
   rare: 'rare.yml'

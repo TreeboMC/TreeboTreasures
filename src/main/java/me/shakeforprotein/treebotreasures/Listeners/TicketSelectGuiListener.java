@@ -1,26 +1,17 @@
 package me.shakeforprotein.treebotreasures.Listeners;
 
-import me.shakeforprotein.treebotreasures.Commands.DailyReward;
 import me.shakeforprotein.treebotreasures.Guis.DailyGui;
 import me.shakeforprotein.treebotreasures.Guis.RewardsGui;
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.yaml.snakeyaml.Yaml;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -68,10 +59,11 @@ public class TicketSelectGuiListener implements Listener {
 
             for (String menuItem : dailyYml.getConfigurationSection("gui.items").getKeys(false)) {
                 if (slot == dailyYml.getInt("gui.items." + menuItem + ".Slot")) {
-                    if ((playerYml.get("claimed." + menuItem) == null || playerYml.getInt("claimed." + menuItem) == 0) && !(playerYml.get("streak") == null) && playerYml.getInt("streak") >= dailyYml.getInt("gui.items." + menuItem + ".DaysUntilPlayerCanClaim")) {
+                    if ((playerYml.get("claimed." + menuItem) == null || !playerYml.getBoolean("claimed." + menuItem)) && !(playerYml.get("streak") == null) && playerYml.getInt("streak") >= dailyYml.getInt("gui.items." + menuItem + ".DaysUntilPlayerCanClaim")) {
                         if (e.getClick() == ClickType.LEFT) {
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), dailyYml.getString("gui.items." + menuItem + ".Command").replace("[Player]", p.getName()));
-                            playerYml.set("claimed." + menuItem, 1);
+
+                                playerYml.set("claimed." + menuItem, true);
                             try {
                                 playerYml.save(playerFile);
                             } catch (IOException err) {

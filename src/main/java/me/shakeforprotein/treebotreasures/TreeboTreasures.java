@@ -10,6 +10,7 @@ import me.shakeforprotein.treebotreasures.Methods.CreateTables;
 import me.shakeforprotein.treebotreasures.Methods.DbKeepAlive;
 import me.shakeforprotein.treebotreasures.UpdateChecker.UpdateChecker;
 import me.shakeforprotein.treebotreasures.Listeners.ConfigureListener;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -92,6 +93,11 @@ public final class TreeboTreasures extends JavaPlugin {
             createTables.createTable();
         }*/
         //dbKeepAlive.dbKeepAlive();
+        if(getConfig().get("bstatsIntegration") != null) {
+            if (getConfig().getBoolean("bstatsIntegration")) {
+                Metrics metrics = new Metrics(this);
+            }
+        }
     }
 
 

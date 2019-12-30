@@ -82,31 +82,61 @@ public class JoinListener implements Listener {
         }, 100L);
 
         if (pl.getConfig().getBoolean("doDailyRewards")) {
+            //Start Set File to Read
+            File dailyRewardsFile = new File(pl.getDataFolder(), "dailyRewards.yml");
+            FileConfiguration dailyYml = YamlConfiguration.loadConfiguration(dailyRewardsFile);
             File playerFileFolder = new File(pl.getDataFolder() + File.separator + "playerFiles");
             File playerFile = new File(playerFileFolder, File.separator + e.getPlayer().getUniqueId() + ".yml");
             FileConfiguration playerYml = YamlConfiguration.loadConfiguration(playerFile);
+            //End set File to Read
 
 
-            Player p = e.getPlayer();
-            //Set default values in case they don't exist
-            long timeNow = (System.currentTimeMillis() / 1000) / 60;
+            Player p = e.getPlayer(); //Make Player object easier to access.
+
+            //Start Set default values in case they don't exist
+            long timeNow = (System.currentTimeMillis());
             long lastToken = timeNow;
             int streak = 0;
             if (playerYml.get("lastToken") != null) {
                 lastToken = playerYml.getLong("lastToken");
             }
+            else{playerYml.set("lastToken", timeNow);}
+
             if (playerYml.get("streak") != null) {
                 streak = playerYml.getInt("streak");
             }
-            if ((timeNow - 3600) > lastToken && ((timeNow - 4800) < lastToken)) {
-                lastToken = timeNow;
-                streak++;
-                p.sendMessage(pl.badge + " You have earned a daily reward. Your current streak is " + streak);
-            } else {
-                boolean doNothing = true;
+            else{
+                playerYml.set("streak", 0);
             }
-            playerYml.set("lastToken", lastToken);
-            playerYml.set("streak", streak);
+            // End Set Defaults
+
+
+            if(moreThanOneDay(lastToken)){
+                for(String key : playerYml.getConfigurationSection("claimed").getKeys(false)){
+                    if(dailyYml.getBoolean("gui.items." + key + ".RepeatsDaily")){
+                        playerYml.set("claimed." + key, "false");
+                    }
+                }
+            }
+
+            if (moreThanOneDay(lastToken) && lessThanTwoDays(lastToken)) { // If more than one day, and less than two days since last login.
+                //Start update players yml file.
+                long newToken = timeNow;  //New Value to store as token
+                streak++;                 // Increase total days steak to unlock next reward
+                playerYml.set("lastToken", newToken);
+                playerYml.set("streak", streak);
+                //End update Player yml
+                if (!playerYml.getBoolean("claimed.R" + streak)) {
+                    p.sendMessage(pl.badge + " You have earned a daily reward. Your current streak is " + streak);
+                }
+            }
+            else if (!lessThanTwoDays(lastToken)) { //If more than two days, reset values
+                 for(String key : playerYml.getConfigurationSection("claimed").getKeys(false)){
+                     playerYml.set("claimed." + key, false);
+                 }
+                 playerYml.set("streak", 0);
+                 playerYml.set("lastToken", System.currentTimeMillis());
+            }
             try {
                 playerYml.save(playerFile);
             } catch (IOException err) {
@@ -150,5 +180,25 @@ public class JoinListener implements Listener {
                 }
             }
         });
+    }
+
+    private boolean moreThanOneDay(long configTime){
+        long now = System.currentTimeMillis();
+        if (now - configTime > 86400000){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    private boolean lessThanTwoDays(long configTime){
+        long now = System.currentTimeMillis();
+        if (now - configTime < (86400000 * 2)){
+            return true;
+        }
+        else{
+            return  false;
+        }
     }
 }
