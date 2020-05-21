@@ -58,18 +58,20 @@ public class TicketSelectGuiListener implements Listener {
             YamlConfiguration playerYml = YamlConfiguration.loadConfiguration(playerFile);
 
             for (String menuItem : dailyYml.getConfigurationSection("gui.items").getKeys(false)) {
-                if (slot == dailyYml.getInt("gui.items." + menuItem + ".Slot")) {
-                    if ((playerYml.get("claimed." + menuItem) == null || !playerYml.getBoolean("claimed." + menuItem)) && !(playerYml.get("streak") == null) && playerYml.getInt("streak") >= dailyYml.getInt("gui.items." + menuItem + ".DaysUntilPlayerCanClaim")) {
-                        if (e.getClick() == ClickType.LEFT) {
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), dailyYml.getString("gui.items." + menuItem + ".Command").replace("[Player]", p.getName()));
+                if (slot == dailyYml.getInt("gui.items." + menuItem + ".Slot") && e.getClickedInventory().getItem(slot).getType().name().equalsIgnoreCase((dailyYml.getString("gui.items." + menuItem + ".ActiveItem")))) {
+                    if (dailyYml.getString("gui.items." + menuItem + ".PermissionNeeded") == null || p.hasPermission(dailyYml.getString("gui.items." + menuItem + ".PermissionNeeded"))) {
+                        if ((playerYml.get("claimed." + menuItem) == null || !playerYml.getBoolean("claimed." + menuItem)) && !(playerYml.get("streak") == null) && playerYml.getInt("streak") >= dailyYml.getInt("gui.items." + menuItem + ".DaysUntilPlayerCanClaim")) {
+                            if (e.getClick() == ClickType.LEFT) {
+                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), dailyYml.getString("gui.items." + menuItem + ".Command").replace("[Player]", p.getName()));
 
                                 playerYml.set("claimed." + menuItem, true);
-                            try {
-                                playerYml.save(playerFile);
-                            } catch (IOException err) {
-                                err.printStackTrace();
+                                try {
+                                    playerYml.save(playerFile);
+                                } catch (IOException err) {
+                                    err.printStackTrace();
+                                }
+                                dailyGui.dailyGui(p);
                             }
-                            dailyGui.dailyGui(p);
                         }
                     }
                 }
