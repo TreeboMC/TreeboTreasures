@@ -19,7 +19,17 @@ public class DailyReward implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        dailyGui.dailyGui((Player) sender);
+        if(pl.roots.getConfig().getString("General.ServerDetails.ServerName").equalsIgnoreCase("Hub")) {
+            if(sender instanceof Player) {
+                dailyGui.dailyGui((Player) sender);
+            }
+            else {
+                sender.sendMessage("As this command opens a GUI, it is not possible to run from console.");
+            }
+        }
+        else {
+            sender.sendMessage(pl.badge + "This command is only enabled on the Hub Server.");
+        }
         return true;
     }
 }

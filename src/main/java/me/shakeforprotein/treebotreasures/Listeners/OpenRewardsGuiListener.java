@@ -3,6 +3,7 @@ package me.shakeforprotein.treebotreasures.Listeners;
 import me.shakeforprotein.treebotreasures.Guis.RewardsGui;
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
@@ -34,7 +35,20 @@ public class OpenRewardsGuiListener implements Listener {
             if (clickedBlock.getState() instanceof Skull) {
                 Skull theSkull = (Skull) clickedBlock.getState();
                 String bUUID = theSkull.getOwningPlayer().getUniqueId().toString();
-                if (bUUID.equalsIgnoreCase("1d060f05-7253-4959-b583-4e023332c965") || bUUID.equalsIgnoreCase("2d060f05-7253-4959-b583-4e023332c965") || bUUID.equalsIgnoreCase("3d060f05-7253-4959-b583-4e023332c965") || bUUID.equalsIgnoreCase("4d060f05-7253-4959-b583-4e023332c965")) {
+                try {
+                    
+                    String bla = (theSkull.getClass().getDeclaredField("properties").get("SkullOwner").toString());
+                    //e.getPlayer().sendMessage(bla);
+                }
+                catch (NoSuchFieldException | IllegalAccessException ex){//e.getPlayer().sendMessage(ex.getMessage());
+                     }
+                if(pl.getConfig().getString("headID") != null && bUUID.equalsIgnoreCase(pl.getConfig().getString("gui.headID"))){
+                    Location openerLoc = clickedBlock.getLocation();
+                    clickedBlock.getWorld().playSound(openerLoc, Sound.BLOCK_CHEST_LOCKED,4,0);
+                    rewardsGui.rewardsGui(p);
+                }
+
+                else if (bUUID.equalsIgnoreCase("1d060f05-7253-4959-b583-4e023332c965") || bUUID.equalsIgnoreCase("2d060f05-7253-4959-b583-4e023332c965") || bUUID.equalsIgnoreCase("3d060f05-7253-4959-b583-4e023332c965") || bUUID.equalsIgnoreCase("4d060f05-7253-4959-b583-4e023332c965")) {
                     Location openerLoc = clickedBlock.getLocation();
                     clickedBlock.getWorld().playSound(openerLoc, Sound.BLOCK_CHEST_LOCKED,4,0);
                     rewardsGui.rewardsGui(p);

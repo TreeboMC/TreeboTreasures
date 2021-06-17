@@ -1,10 +1,7 @@
 package me.shakeforprotein.treebotreasures.Commands;
 
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Effect;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +13,9 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.ArrayList;
 
-public class IssueReward implements CommandExecutor {
+import java.util.concurrent.ThreadLocalRandom;
+
+public class  IssueReward implements CommandExecutor {
 
     private TreeboTreasures pl;
 
@@ -24,7 +23,7 @@ public class IssueReward implements CommandExecutor {
         this.pl = main;
     }
 
-
+    private double  c1,c2,c3 = 0;
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         int keys = 0;
@@ -113,6 +112,23 @@ public class IssueReward implements CommandExecutor {
                 else{
                     p.sendMessage(pl.badge + "You have " + (keys - 1) + " " + args[1] + " Keys remaining, and received " + ChatColor.GOLD + receivedItem.getAmount() + ChatColor.RESET + " X " + ChatColor.GOLD + receivedItem.getType().name());
                 }
+/*
+                Set<String> keySet = pl.getConfig().getConfigurationSection("effects").getKeys(false);
+                int target = ThreadLocalRandom.current().nextInt(0, keySet.size());
+                String effectKey = "";
+                int i=0;
+                for(String tempKey : keySet){
+                    if(i == target){
+                        effectKey = tempKey;
+                        break;
+                    }
+                    else{
+                        i++;
+                    }
+                }
+                spiral(p, pl.getConfig().getString("effect." + effectKey + ".visual"), 0.04, 0.01, 0.04, 1, pl.getConfig().getString("effect." + effectKey + ".sound"));
+
+ */
             }
             else{
                 p.sendMessage(pl.badge + "You have " + (keys - 1) + " " + args[1] + " Keys");
@@ -128,5 +144,50 @@ public class IssueReward implements CommandExecutor {
     private int randomWithRange(int min, int max) {
         int range = Math.abs(max - min) + 1;
         return (int) (Math.random() * range) + (min <= max ? min : max);
+    }
+
+
+    private Runnable theRunnable = new Runnable() {
+        @Override
+        public void run() {
+
+        }
+    };
+
+
+    public void spiral(Player p, String particle, double a1, double a2, double a3, int o1, String s1){
+
+        c1 = 0;
+        c2 = 0;
+        c3 = 0;
+
+        theRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if(c2 < 3) {
+                    c1 = c1 + a1;
+                    c2 = c2 + a2;
+                    c3 = c3 + a3;
+                    p.getWorld().spawnParticle(Particle.valueOf(particle), p.getLocation().add(Math.cos(c1), c2, Math.sin(c3)), 3);
+                    p.getWorld().spawnParticle(Particle.valueOf(particle), p.getLocation().add(Math.sin(c1), c2, Math.cos(c3)), 3);
+                    p.getWorld().spawnParticle(Particle.valueOf(particle), p.getLocation().subtract(Math.cos(c1), (c2 - 2), Math.sin(c3)), 3);
+                    p.getWorld().spawnParticle(Particle.valueOf(particle), p.getLocation().subtract(Math.sin(c1), (c2 - 2), Math.cos(c3)), 3);
+
+                    Note.Tone tone = Note.Tone.values()[ThreadLocalRandom.current().nextInt(o1, Note.Tone.values().length)];
+                    p.getWorld().playSound(p.getLocation(), Sound.valueOf(s1), 3, tone.ordinal());
+                    //p.playNote(p.getLocation(), Instrument.XYLOPHONE, Note.natural(1, tone));
+                    Bukkit.getScheduler().runTaskLater(pl, theRunnable, 2);
+
+                }
+                else{
+                    c1 = 0;
+                    c2 = 0;
+                    c3 = 0;
+                    //p.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, p.getLocation(), 3);
+                }
+            }
+        };
+
+        Bukkit.getScheduler().runTaskLater(pl, theRunnable, 2);
     }
 }

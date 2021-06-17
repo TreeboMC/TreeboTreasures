@@ -41,11 +41,11 @@ public class ConfigureRewards implements CommandExecutor {
                     try {
                         lootMenu.options().copyDefaults();
                         lootMenu.save(lootFile);
-                    } catch (FileNotFoundException e) {
-                        pl.makeLog(e);
+                    } catch (FileNotFoundException ex) {
+                        pl.roots.errorLogger.logError(pl, ex);
                     }
-                } catch (IOException e) {
-                    pl.makeLog(e);
+                } catch (IOException ex) {
+                    pl.roots.errorLogger.logError(pl, ex);
                 }
             }
 

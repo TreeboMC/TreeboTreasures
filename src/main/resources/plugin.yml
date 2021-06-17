@@ -6,6 +6,7 @@ prefix: TreeboTreasures
 authors: [ShakeforProtein]
 description: An easy to use rewards plugin, featuring configurable reward tiers and an intuitive admin interface.
 website: treebo.games/minecraft
+depend: [TreeboRoots]
 
 commands:
   keyparty:

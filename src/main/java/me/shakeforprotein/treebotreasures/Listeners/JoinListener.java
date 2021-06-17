@@ -2,23 +2,22 @@ package me.shakeforprotein.treebotreasures.Listeners;
 
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class JoinListener implements Listener {
 
@@ -45,17 +44,33 @@ public class JoinListener implements Listener {
                     public void run() {
                         try {
                             Player p = e.getPlayer();
-                            pl.openConnection();
 
-                            ResultSet exists = pl.connection.createStatement().executeQuery("SELECT Count(*) AS COUNT FROM `TreeboTreasures` WHERE UUID = '" + p.getUniqueId() + "'");
+                            String[] columns = new String[1];
+                            String[] values = new String[1];
+                            columns[0] = "UUID";
+                            values[0] = p.getUniqueId().toString();
+
+                            ResultSet exists = pl.roots.mySQL.processPreparedSelectQuery("Count(*) AS COUNT", pl.table, columns, values);
                             while (exists.next()) {
                                 if (exists.getInt("COUNT") < 1) {
                                     System.out.println(pl.badge + "Player not found in database. Adding new entry");
-                                    int insert = pl.connection.createStatement().executeUpdate("INSERT INTO `" + pl.table + "` (UUID, IGNAME) VALUES ('" + p.getUniqueId() + "','" + p.getName() + "');");
+                                    columns = new String[2];
+                                    values = new String[2];
+                                    columns[0] = "UUID";
+                                    columns[1] = "IGNAME";
+                                    values[0] = p.getUniqueId().toString();
+                                    values[1] = p.getName();
+                                    pl.roots.mySQL.processPreparedInsert(pl.table, columns, values);
+                                    //int insert = pl.connection.createStatement().executeUpdate("INSERT INTO `" + pl.table + "` (UUID, IGNAME) VALUES ('" + p.getUniqueId() + "','" + p.getName() + "');");
                                 }
                             }
 
-                            ResultSet results = pl.connection.createStatement().executeQuery("SELECT * FROM `" + pl.table + "` WHERE `UUID` = '" + p.getUniqueId() + "'");
+                            columns = new String[1];
+                            values = new String[1];
+                            columns[0] = "UUID";
+                            values[0] = p.getUniqueId().toString();
+                            ResultSet results = pl.roots.mySQL.processPreparedSelectQuery("*", pl.table, columns, values);
+                            //ResultSet results = pl.connection.createStatement().executeQuery("SELECT * FROM `" + pl.table + "` WHERE `UUID` = '" + p.getUniqueId() + "'");
                             while (results.next()) {
                                 for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
                                     pl.getConfig().set("keys." + p.getUniqueId() + "." + menuItem.toUpperCase(), results.getInt(menuItem));
@@ -73,19 +88,21 @@ public class JoinListener implements Listener {
                             if (p.isOnline()) {
                                 joinHash.put(p.getUniqueId(), p);
                             }
-                        } catch (Exception err) {
-                            pl.makeLog(err);
+                        } catch (Exception ex) {
+                            pl.roots.errorLogger.logError(pl, ex);
                         }
                     }
                 });
             }
         }, 100L);
-
-        if (pl.getConfig().getBoolean("doDailyRewards")) {
+         if(pl.getConfig().getBoolean("doDailyRewards")){
+             setDefaultValuesForPlayerFile(e.getPlayer());
+         }
+        /*if (pl.getConfig().getBoolean("doDailyRewards")) {
             //Start Set File to Read
             File dailyRewardsFile = new File(pl.getDataFolder(), "dailyRewards.yml");
             FileConfiguration dailyYml = YamlConfiguration.loadConfiguration(dailyRewardsFile);
-            File playerFileFolder = new File(pl.getDataFolder() + File.separator + "playerFiles");
+            File playerFileFolder = new File(pl.getDataFolder() + File.separator + "playerFiles2");
             File playerFile = new File(playerFileFolder, File.separator + e.getPlayer().getUniqueId() + ".yml");
             FileConfiguration playerYml = YamlConfiguration.loadConfiguration(playerFile);
             //End set File to Read
@@ -107,6 +124,19 @@ public class JoinListener implements Listener {
             }
             else{
                 playerYml.set("streak", 0);
+            }
+
+            for(String menuItem : dailyYml.getConfigurationSection("gui.items").getKeys(false)){
+                if(dailyYml.get("gui.items." + menuItem + ".StreakRequired") != null){
+                    if(playerYml.get("claimed." + menuItem) == null) {
+                        playerYml.set("claimed." + menuItem, false);
+                    }
+                }
+                else{
+                    if(playerYml.get("lastClaimed." + menuItem) == null) {
+                        playerYml.set("lastClaimed." + menuItem, convertToDays(System.currentTimeMillis()) - 1);
+                    }
+                }
             }
             // End Set Defaults
 
@@ -142,7 +172,7 @@ public class JoinListener implements Listener {
             } catch (IOException err) {
                 boolean doNothing = true;
             }
-        }
+        }*/
     }
 
 
@@ -153,21 +183,28 @@ public class JoinListener implements Listener {
                 try {
                     Player p = e.getPlayer();
                     if (joinHash.containsKey(p.getUniqueId())) {
-                        pl.openConnection();
                         String zeroString = "";
+                        int totalMenuItems = pl.getConfig().getConfigurationSection("gui.items").getKeys(false).size();
+                        String[] columns = new String[totalMenuItems];
+                        String[] values = new String[totalMenuItems];
+                        int counter = 0;
                         for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
                             if (pl.getConfig().get("keys." + p.getUniqueId()) != null) {
                                 if (pl.getConfig().get("keys." + p.getUniqueId() + "." + menuItem.toUpperCase()) != null) {
-                                    zeroString += "" + menuItem + " = " + pl.getConfig().getInt("keys." + p.getUniqueId() + "." + menuItem.toUpperCase()) + ", ";
+                                    columns[counter] = menuItem;
+                                    values[counter] = pl.getConfig().getString("keys." + p.getUniqueId() + "." + menuItem.toUpperCase());
+                                    //zeroString += "" + menuItem + " = " + pl.getConfig().getInt("keys." + p.getUniqueId() + "." + menuItem.toUpperCase()) + ", ";
                                 }
                             } else {
                                 p.sendMessage("ERROR");
                                 break;
                             }
                         }
-                        zeroString = zeroString.replaceAll(", $", "");
-                        System.out.println("UPDATE `" + pl.table + "` SET " + zeroString + " WHERE `UUID` = '" + p.getUniqueId() + "'");
-                        int results = pl.connection.createStatement().executeUpdate("UPDATE `" + pl.table + "` SET " + zeroString + " WHERE `UUID` = '" + p.getUniqueId() + "'");
+                        //zeroString = zeroString.replaceAll(", $", "");
+                        //System.out.println("UPDATE `" + pl.table + "` SET " + zeroString + " WHERE `UUID` = '" + p.getUniqueId() + "'");
+
+                        pl.roots.mySQL.processPreparedUpdate(pl.table, columns, values, "UUID", "=", p.getUniqueId().toString());
+                        //int results = pl.connection.createStatement().executeUpdate("UPDATE `" + pl.table + "` SET " + zeroString + " WHERE `UUID` = '" + p.getUniqueId() + "'");
                         for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
                             //pl.getConfig().set("keys." + p.getUniqueId() + "." + menuItem.toUpperCase(), 0);
                             pl.getConfig().set("keys." + p.getUniqueId(), null);
@@ -176,7 +213,7 @@ public class JoinListener implements Listener {
                         joinHash.remove(p.getUniqueId());
                     }
                 } catch (Exception err) {
-                    pl.makeLog(err);
+                    pl.roots.errorLogger.logError(pl, err);
                 }
             }
         });
@@ -201,4 +238,40 @@ public class JoinListener implements Listener {
             return  false;
         }
     }
+
+    private long convertToDays(Long daysInMillis){
+        return daysInMillis / 86400000;
+    }
+
+    public void setDefaultValuesForPlayerFile(Player p){
+        File dailyRewardsFile = new File(pl.getDataFolder(), "dailyRewards.yml");
+        FileConfiguration dailyYml = YamlConfiguration.loadConfiguration(dailyRewardsFile);
+        File playerFile = new File(pl.playerDataFolder + File.separator + p.getUniqueId(), "TTreasures_DailyReward.yml");
+        FileConfiguration playerYml = YamlConfiguration.loadConfiguration(playerFile);
+        if(!playerFile.exists()) {
+            playerYml.set("lastToken", System.currentTimeMillis());
+            playerYml.set("streak", 0);
+            for (String key : dailyYml.getConfigurationSection("gui.items").getKeys(false)) {
+                if (playerYml.get("claimed." + key) == null) {
+                    playerYml.set("claimed." + key, 0);
+                }
+            }
+        } else{
+            if( ((int) (TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis()) - TimeUnit.MILLISECONDS.toDays(playerYml.getLong("lastToken"))) == 1)){
+                playerYml.set("lastToken", System.currentTimeMillis());
+                playerYml.set("streak", playerYml.getInt("streak") + 1);
+            } else if(((int) (TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis()) - TimeUnit.MILLISECONDS.toDays(playerYml.getLong("lastToken"))) > 1)){
+                playerYml.set("lastToken", System.currentTimeMillis());
+                playerYml.set("streak", 0);
+            }
+        }
+
+        try {
+            playerYml.save(playerFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }

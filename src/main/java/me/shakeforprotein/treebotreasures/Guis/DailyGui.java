@@ -1,6 +1,7 @@
 package me.shakeforprotein.treebotreasures.Guis;
 
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -13,156 +14,109 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+
 public class DailyGui {
 
     private TreeboTreasures pl;
+    private File dailyGuiFile;
+    private YamlConfiguration dailyYml;
 
     public DailyGui(TreeboTreasures main) {
         this.pl = main;
+
+        dailyGuiFile = new File(pl.getDataFolder(), "dailyRewards.yml");
+        dailyYml = YamlConfiguration.loadConfiguration(dailyGuiFile);
     }
 
     public void dailyGui(Player p) {
 
-        File dailyGuiFile = new File(pl.getDataFolder(), "dailyRewards.yml");
-        YamlConfiguration dailyYml = YamlConfiguration.loadConfiguration(dailyGuiFile);
-        File playerFile = new File(pl.getDataFolder() + File.separator + "playerFiles", p.getUniqueId() + ".yml");
+        File playerFile = new File(pl.playerDataFolder + File.separator + p.getUniqueId().toString(), "TTreasures_DailyReward" + ".yml");
         YamlConfiguration playerYml = YamlConfiguration.loadConfiguration(playerFile);
-        boolean allClaimed = true;
+        Inventory dailyInventory = prepareInventory(p, playerYml);
 
-        int rows = dailyYml.getInt("gui.rows");
+        p.openInventory(dailyInventory);
+    }
+
+
+    private Inventory prepareInventory(Player p, YamlConfiguration playerYml){
+        int invSize = dailyYml.getInt("gui.rows") * 9;
         String title = ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.title") + "");
 
-        Inventory thisInv = Bukkit.createInventory(null, rows * 9, title);
-        for (int slot = 0; slot < thisInv.getSize(); slot++) {
-            ItemStack fillerItem = new ItemStack(Material.valueOf(dailyYml.getString("gui.filler")));
-            ItemMeta fillMeta = fillerItem.getItemMeta();
-            fillMeta.setDisplayName(" ");
-            fillerItem.setItemMeta(fillMeta);
-            thisInv.setItem(slot, fillerItem);
-        }
-        for (String menuItem : dailyYml.getConfigurationSection("gui.items").getKeys(false)) {
-            int position = dailyYml.getInt("gui.items." + menuItem + ".Slot");
-            ItemStack newItem;
+        Inventory newInv = Bukkit.createInventory(null, invSize, title);
 
-            if (playerYml.get("claimed." + menuItem) == null) {
-                playerYml.set("claimed." + menuItem, false);
-                try {
-                    playerYml.save(playerFile);
-                } catch (IOException err) {
-                    err.printStackTrace();
-                }
-            }
-            if (playerYml.getInt("streak") < dailyYml.getInt("gui.items." + menuItem + ".DaysUntilPlayerCanClaim")) {
-                playerYml.set("claimed." + menuItem, false);
-            }
-            if (!playerYml.getBoolean("claimed." + menuItem)) {
-                allClaimed = false;
-            }
-
-
-            if (!playerYml.getBoolean("claimed." + menuItem) && playerYml.getInt("streak") >= dailyYml.getInt("gui.items." + menuItem + ".DaysUntilPlayerCanClaim") && (dailyYml.getString("gui.items." + menuItem + ".PermissionNeeded") == null || p.hasPermission(dailyYml.getString("gui.items." + menuItem + ".PermissionNeeded")))) {
-                    newItem = new ItemStack(Material.valueOf(dailyYml.getString("gui.items." + menuItem + ".ActiveItem")), dailyYml.getInt("gui.items." + menuItem + ".ActiveItemAmount"));
-                    ItemMeta newMeta = newItem.getItemMeta();
-                    List<String> newLore = new ArrayList<>();
-                    newMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + menuItem + ".Heading")));
-                    String configLore = dailyYml.getString("gui.items." + menuItem + ".ActiveLore").replace("some days", playerYml.getInt("streak") + " days");
-                    for (String txt : configLore.split(";")) {
-                        newLore.add(ChatColor.translateAlternateColorCodes('&', txt.replace(";", "\n")));
-                    }
-                    newLore.add("");
-                    newLore.add(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + menuItem + ".CanBeClaimedFormat")));
-                    newMeta.setLore(newLore);
-                    newItem.setItemMeta(newMeta);
-                    addGlow(newItem);
-            } else {
-                newItem = new ItemStack(Material.valueOf(dailyYml.getString("gui.items." + menuItem + ".InactiveItem")), dailyYml.getInt("gui.items." + menuItem + ".InactiveItemAmount"));
-                ItemMeta newMeta = newItem.getItemMeta();
-                List<String> newLore = new ArrayList<>();
-
-                newMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + menuItem + ".Heading")));
-                String configLore = dailyYml.getString("gui.items." + menuItem + ".InactiveLore").replace("some days", playerYml.getInt("streak") + " days").replace("%days", (1111) + "");
-                for (String txt : configLore.split(";")) {
-                    newLore.add(ChatColor.translateAlternateColorCodes('&', txt));
-                }
-                newLore.add("");
-                int totalDays = dailyYml.getInt("gui.items." + menuItem + ".DaysUntilPlayerCanClaim") - playerYml.getInt("streak");
-                if (totalDays < 1) {
-                    newLore.add(ChatColor.DARK_RED + "You have already claimed this reward");
-
-                } else {
-                    String dayString = "";
-                    if (totalDays == 1) {
-                        long now = System.currentTimeMillis();
-                        long configTime = playerYml.getLong("lastToken");
-                        dayString = getDurationBreakdown(86400000 - (now - configTime));
-                    } else {
-                        dayString = totalDays + "";
-                    }
-                    newLore.add(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + menuItem + ".TimeToClaimFormat").replace("%days", dayString + "")));
-                }
-                newMeta.setLore(newLore);
-                newItem.setItemMeta(newMeta);
-
-            }
-            thisInv.setItem(position, newItem);
-
-
-        }
-        if (allClaimed) {
-            playerYml.set("claimed", null);
-            playerYml.set("streak", 0);
-            //playerYml.set("lastToken", System.currentTimeMillis());
-            try {
-                playerYml.save(playerFile);
-            } catch (IOException err) {
-                err.printStackTrace();
-            }
-        }
-        for (int slot = 0; slot < thisInv.getSize(); slot++) {
-            if (thisInv.getItem(slot).getType() == Material.AIR) {
-                ItemStack airItem = new ItemStack(Material.AIR);
-                thisInv.setItem(slot, airItem);
-            }
+        for(String key: dailyYml.getConfigurationSection("gui.items").getKeys(false)){
+            int slot = dailyYml.getInt("gui.items." + key + ".Slot");
+            newInv.setItem(slot, getItem(key, p, playerYml));
         }
 
-        p.openInventory(thisInv);
+        return newInv;
     }
 
-    public void addGlow(ItemStack stack) {
-        ItemMeta meta = stack.getItemMeta();
-        meta.addEnchant(Enchantment.LURE, 1, false);
+    private ItemStack getItem(String key, Player p, YamlConfiguration playerYml){
+        Material theMaterial = Material.valueOf(dailyYml.getString("gui.items." + key + ".InactiveItem"));
+        ItemStack theItem = new ItemStack(theMaterial);
+        String shortKey = "gui.items." + key;
+        if(isAllowed(p, key, playerYml)){
+            theMaterial = Material.valueOf(dailyYml.getString(shortKey + ".ActiveItem"));
+            theItem.setType(theMaterial);
+            theItem = setLore(key, theItem, true, playerYml);
+        } else{
+            theItem = setLore(key, theItem, false, playerYml);
+        }
+
+
+        return theItem;
+    }
+
+    private boolean isAllowed (Player p, String key, YamlConfiguration playerYml){
+        String shortKey = "gui.items." + key;
+        int requiredStreak = dailyYml.getInt(shortKey + ".RequiredStreak");
+        int playerStreak = playerYml.getInt("streak");
+        String requiredPermission = dailyYml.getString(shortKey + ".RequiredPermission");
+        if(requiredPermission == null || requiredPermission.equals("")){
+            requiredPermission = "nte.member";
+        }
+        if(p.hasPermission(requiredPermission)
+                && playerStreak >= requiredStreak
+                && TimeUnit.MILLISECONDS.toDays((System.currentTimeMillis() - playerYml.getLong("claimed." + key))) >= dailyYml.getInt(shortKey + ".DaysUntilPlayerCanClaim")
+                && TimeUnit.MILLISECONDS.toDays((System.currentTimeMillis())) - TimeUnit.MILLISECONDS.toDays(playerYml.getLong("claimed." + key)) >= 1){
+            return true;
+        }
+        return false;
+    }
+
+    private ItemStack setLore(String key, ItemStack item, boolean isActive, YamlConfiguration playerYml){
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + key + ".Heading")));
+        List<String> newLore = new ArrayList<>();
+        if(isActive){
+            String configLore = dailyYml.getString("gui.items." + key + ".ActiveLore").replace("some days", playerYml.getInt("streak") + " days");
+            for (String txt : configLore.split(";")) {
+                newLore.add(ChatColor.translateAlternateColorCodes('&', txt.replace(";", "\n")));
+            }
+            newLore.add("");
+            newLore.add(ChatColor.translateAlternateColorCodes('&', dailyYml.getString("gui.items." + key + ".CanBeClaimedFormat")));
+        }
+        else{
+            String configLore = dailyYml.getString("gui.items." + key + ".InactiveLore").replace("some days", playerYml.getInt("streak") + " days").replace("%days", (1111) + "");
+            for (String txt : configLore.split(";")) {
+                newLore.add(ChatColor.translateAlternateColorCodes('&', txt));
+            }
+            newLore.add("");
+            int totalDays = dailyYml.getInt("gui.items." + key + ".StreakRequired") - playerYml.getInt("streak");
+            if (totalDays < 1) {
+                newLore.add(ChatColor.DARK_RED + "You Cannot claim this reward at this time.");
+            }
+        }
+        meta.setLore(newLore);
+        meta.addEnchant(Enchantment.LURE, 1, true);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        stack.setItemMeta(meta);
-    }
+        item.setItemMeta(meta);
 
-    public static String getDurationBreakdown(long millis) {
-        if (millis < 0) {
-            throw new IllegalArgumentException("Duration must be greater than zero!");
-        }
-
-        long days = TimeUnit.MILLISECONDS.toDays(millis);
-        millis -= TimeUnit.DAYS.toMillis(days);
-        long hours = TimeUnit.MILLISECONDS.toHours(millis);
-        millis -= TimeUnit.HOURS.toMillis(hours);
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-        millis -= TimeUnit.MINUTES.toMillis(minutes);
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
-
-        StringBuilder sb = new StringBuilder(64);
-        sb.append(days);
-        sb.append(" Days ");
-        sb.append(hours);
-        sb.append(" Hours ");
-        sb.append(minutes);
-        sb.append(" Minutes ");
-        sb.append(seconds);
-        sb.append(" Seconds");
-
-        return (sb.toString());
+        return item;
     }
 }

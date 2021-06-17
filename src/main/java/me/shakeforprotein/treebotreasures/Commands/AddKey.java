@@ -2,11 +2,13 @@ package me.shakeforprotein.treebotreasures.Commands;
 
 import me.shakeforprotein.treebotreasures.Listeners.JoinListener;
 import me.shakeforprotein.treebotreasures.TreeboTreasures;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class AddKey implements CommandExecutor {
@@ -37,13 +39,18 @@ public class AddKey implements CommandExecutor {
                     int newKeys = currentKeys + Integer.parseInt(args[2]);
                     pl.getConfig().set("keys." + uuid + "." + type, newKeys);
                     if(target instanceof Player) {
-                        ((Player) target).sendMessage("You have received " + amount + " " + type + " key(s).");
+                        if(pl.getConfig().getString("msg.addkey") != null) {
+                            ((Player) target).sendMessage(ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("msg.addkey").replace("%amount%", amount).replace("%type%", type).replace("%badge%", pl.badge)));
+                        } else {
+                            pl.getConfig().set("msg.addkey", pl.badge + "You have received " + amount + " " + type + " key(s).");
+                            ((Player) target).sendMessage(ChatColor.translateAlternateColorCodes('&', pl.badge + "You have received " + amount + " " + type + " key(s)."));
+                        }
                     }
                     sender.sendMessage(pl.badge + "Successfully Assigned key(s)");
                     pl.saveConfig();
                 }
                 else{
-                    sender.sendMessage("Player keys not yet loaded. Caching keys for later.");
+                    sender.sendMessage(pl.err + "Player keys not yet loaded. Caching keys for later.");
                     if(pl.getConfig().get("cachedKeys." + uuid + "." + type) != null){
                         pl.getConfig().set("cachedKeys." + uuid + "." + type, Integer.parseInt(args[2]) + pl.getConfig().getInt("cachedKKeys." + uuid + "." + type));
                     }
@@ -60,61 +67,47 @@ public class AddKey implements CommandExecutor {
 
         return true;
     }
-/*    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        Bukkit.getServer().getScheduler().runTaskAsynchronously(pl, new Runnable() {
+
+
+    private Runnable theRunnable = new Runnable() {
+        @Override
+        public void run() {
+
+        }
+    };
+
+    double c1, c2, c3 = 0;
+    public void spiral(Player p, String particle, double a1, double a2, double a3, int o1, String s1){
+
+        c1 = 0;
+        c2 = 0;
+        c3 = 0;
+
+        theRunnable = new Runnable() {
+            @Override
             public void run() {
-                pl.createConnection();
-                    if(args.length == 3)
-            {
-                if (pl.isNumeric(args[2])) {
-                    String uuid = Bukkit.getOfflinePlayer(args[0]).getUniqueId().toString();
-                    String name = Bukkit.getOfflinePlayer(args[0]).getName();
-                    String type = args[1].toUpperCase();
-                    String amount = args[2];
-                    String query;
-                    ResultSet response;
-                    try {
-                        query = "SELECT Count(*) AS TOTAL FROM `" + pl.table + "` WHERE UUID = '" + uuid + "'";
-                        response = pl.connection.createStatement().executeQuery(query);
-                        while (response.next()) {
-                            if (response.getInt("TOTAL") == 0) {
-                                query = "INSERT INTO `" + pl.table + "`(`UUID`, `IGNAME`, `" + type + "`) VALUES  ('" + uuid + "','" + name + "','" + amount + "')";
-                                sender.sendMessage("Adding " + amount + " key(s) to player " + name);
-                                int response2 = 456456456;
-                                response2 = pl.connection.createStatement().executeUpdate(query);
-                                if (response2 != 456456456) {
-                                    sender.sendMessage("Assigning key Successful");
-                                } else {
-                                    sender.sendMessage("Assigning key Failed with response code " + response2);
-                                }
-                            } else {
-                                query = "UPDATE  `" + pl.table + "` SET  `IGNAME` = '" + name + "',`" + type + "` = " + type + " + " + amount + "  WHERE  `UUID` = '" + uuid + "'";
-                                int response2 = 456456456;
-                                response2 = pl.connection.createStatement().executeUpdate(query);
-                                if (response2 != 456456456) {
-                                    sender.sendMessage("Assigning key Successful");
-                                } else {
-                                    sender.sendMessage("Assigning key Failed with response code " + response2);
-                                }
-                            }
-                        }
-                    } catch (SQLException e) {
-                        System.out.println("Encountered " + e.toString() + " during AddKey()");
-                        pl.makeLog(e);
-                    }
-                } else {
-                    sender.sendMessage(pl.err + " Third argument must be a number.");
+                if(c2 < 3) {
+                    c1 = c1 + a1;
+                    c2 = c2 + a2;
+                    c3 = c3 + a3;
+                    p.getWorld().spawnParticle(Particle.valueOf(particle), p.getLocation().add(Math.cos(c1), c2, Math.sin(c3)), 3);
+                    p.getWorld().spawnParticle(Particle.valueOf(particle), p.getLocation().add(Math.sin(c1), c2, Math.cos(c3)), 3);
+                    p.getWorld().spawnParticle(Particle.valueOf(particle), p.getLocation().subtract(Math.cos(c1), (c2 - 2), Math.sin(c3)), 3);
+                    p.getWorld().spawnParticle(Particle.valueOf(particle), p.getLocation().subtract(Math.sin(c1), (c2 - 2), Math.cos(c3)), 3);
+
+                    Note.Tone tone = Note.Tone.values()[ThreadLocalRandom.current().nextInt(o1, Note.Tone.values().length)];
+                    p.getWorld().playSound(p.getLocation(), Sound.valueOf(s1), 3, tone.ordinal());
+                    Bukkit.getScheduler().runTaskLater(pl, theRunnable, 2);
+
+                }
+                else{
+                    c1 = 0;
+                    c2 = 0;
+                    c3 = 0;
                 }
             }
-        else
-            {
-                sender.sendMessage(pl.badCommand + "/AddKey <Playername> <KeyType> <Quantity>");
-            }
-        pl.closeConnection();
-            }
-        });
-        return true;
+        };
+
+        Bukkit.getScheduler().runTaskLater(pl, theRunnable, 2);
     }
- */
 }

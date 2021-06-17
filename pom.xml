@@ -6,7 +6,7 @@
 
     <groupId>me.shakeforprotein</groupId>
     <artifactId>TreeboTreasures</artifactId>
-    <version>0.0.18</version>
+    <version>0.3.0</version>
     <packaging>jar</packaging>
 
     <name>TreeboTreasures</name>
@@ -105,6 +105,12 @@
             <artifactId>bstats-bukkit</artifactId>
             <version>1.5</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.ShakeforProtein</groupId>
+            <artifactId>TreeboRoots</artifactId>
+            <version>0.0.6</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
