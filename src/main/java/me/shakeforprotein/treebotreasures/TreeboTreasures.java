@@ -11,6 +11,7 @@ import me.shakeforprotein.treebotreasures.Listeners.ConfigureListener;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
@@ -108,7 +109,7 @@ public final class TreeboTreasures extends JavaPlugin {
 
     private void scheduleRootsIntegrations(){
         Bukkit.getScheduler().runTaskLater(this, () -> {
-            roots.updateHandler.registerPlugin(instance, "TreeboMC", "TreeboTreasures");
+            roots.updateHandler.registerPlugin(instance, "TreeboMC", "TreeboTreasures", Material.ENDER_CHEST);
             new HelpBook(instance);
         }, 100L);
     }
