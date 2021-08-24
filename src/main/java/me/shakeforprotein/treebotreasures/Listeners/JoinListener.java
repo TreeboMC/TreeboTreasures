@@ -13,8 +13,6 @@ import org.bukkit.event.player.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
-import java.sql.Time;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -189,14 +187,15 @@ public class JoinListener implements Listener {
                         String[] values = new String[totalMenuItems];
                         int counter = 0;
                         for (String menuItem : pl.getConfig().getConfigurationSection("gui.items").getKeys(false)) {
-                            if (pl.getConfig().get("keys." + p.getUniqueId()) != null) {
-                                if (pl.getConfig().get("keys." + p.getUniqueId() + "." + menuItem.toUpperCase()) != null) {
+                            if (pl.getConfig().get("keys." + p.getUniqueId().toString()) != null) {
+                                if (pl.getConfig().get("keys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase()) != null) {
                                     columns[counter] = menuItem;
-                                    values[counter] = pl.getConfig().getString("keys." + p.getUniqueId() + "." + menuItem.toUpperCase());
+                                    values[counter] = pl.getConfig().getString("keys." + p.getUniqueId().toString() + "." + menuItem.toUpperCase());
+                                    counter++;
                                     //zeroString += "" + menuItem + " = " + pl.getConfig().getInt("keys." + p.getUniqueId() + "." + menuItem.toUpperCase()) + ", ";
                                 }
                             } else {
-                                p.sendMessage("ERROR");
+                                System.out.println("ERROR, player keys were null.");
                                 break;
                             }
                         }

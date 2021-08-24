@@ -52,6 +52,11 @@ public class  IssueReward implements CommandExecutor {
                         sender.sendMessage(pl.badge + "Player has " + keys + " " + args[1] + " keys");
 
                         File rewardsFile = new File(pl.getDataFolder() + File.separator + "lootTables", keyType + ".yml");
+                        if(!rewardsFile.exists()){
+                            p.sendMessage(pl.badge + "Loot table missing for reward type '" + keyType + "'. A ticket has automatically been generated.");
+                            Bukkit.dispatchCommand(Bukkit.getPlayer(args[0]), "ticket The '" + keyType + "' loot table is missing. This ticket was generated automatically.");
+                            return true;
+                        }
                         FileConfiguration rewardsYml = YamlConfiguration.loadConfiguration(rewardsFile);
                         ArrayList<String> validItems = new ArrayList<>();
                         for (String ymlItem : rewardsYml.getConfigurationSection("items").getKeys(false)) {

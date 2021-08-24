@@ -31,6 +31,7 @@ public class ShowRewards implements CommandExecutor {
 
                 if (!lootFile.exists()) {
                     sender.sendMessage(pl.err + " No such Loot table");
+                    return true;
                 }
                 else {
 

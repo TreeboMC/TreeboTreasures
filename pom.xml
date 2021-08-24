@@ -6,7 +6,7 @@
 
     <groupId>me.shakeforprotein</groupId>
     <artifactId>TreeboTreasures</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
     <packaging>jar</packaging>
 
     <name>TreeboTreasures</name>
@@ -109,7 +109,7 @@
         <dependency>
             <groupId>me.ShakeforProtein</groupId>
             <artifactId>TreeboRoots</artifactId>
-            <version>0.0.6</version>
+            <version>0.0.7</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
